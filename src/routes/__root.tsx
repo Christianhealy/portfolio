@@ -118,9 +118,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SiteChrome>
-        <Outlet />
-      </SiteChrome>
+      <Outlet />
     </QueryClientProvider>
   );
 }

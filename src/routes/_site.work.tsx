@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PortfolioGallery } from "@/components/portfolio/PortfolioGallery";
 
-export const Route = createFileRoute("/work")({
+export const Route = createFileRoute("/_site/work")({
   head: () => ({
     meta: [
       { title: "Selected Work — Atelier Noir" },
