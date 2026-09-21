@@ -11,7 +11,6 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { SiteChrome } from "@/components/portfolio/SiteChrome";
 import { Button } from "@/components/ui/button";
 
 function NotFoundComponent() {

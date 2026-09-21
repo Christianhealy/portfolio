@@ -1,4 +1,4 @@
-import { Outlet } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { SiteChrome } from "@/components/portfolio/SiteChrome";
 
 export const Route = createFileRoute("/_site")({
