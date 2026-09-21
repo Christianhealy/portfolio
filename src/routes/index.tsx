@@ -1,5 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Reveal } from "@/components/portfolio/Reveal";
+import { createFileRoute, Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -25,25 +24,13 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   return (
-    <main className="mx-auto max-w-[1600px] px-6 pb-16 pt-10 sm:px-12 sm:pb-24 sm:pt-14">
-      <Reveal>
-        <div className="relative min-h-[68vh] overflow-hidden">
-          <img
-            src="/images/portfolio/photo1.jpg"
-            alt="Atelier Noir selected photography"
-            className="absolute inset-0 size-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-background/10" />
-          <div className="absolute inset-x-0 bottom-0 p-6 sm:p-10">
-            <p className="mb-4 text-[10px] uppercase tracking-[0.2em] text-foreground/75">
-              Photography · Film
-            </p>
-            <h1 className="max-w-4xl font-display text-5xl leading-none sm:text-7xl lg:text-8xl">
-              Light, shadow and the quiet moments in between.
-            </h1>
-          </div>
-        </div>
-      </Reveal>
+    <main className="flex h-screen w-screen items-center justify-center overflow-hidden bg-background px-6">
+      <Link
+        to="/work"
+        className="group relative inline-flex items-center justify-center border border-foreground px-12 py-4 text-[11px] uppercase tracking-[0.22em] text-foreground transition-colors duration-300 hover:bg-foreground hover:text-background"
+      >
+        Enter
+      </Link>
     </main>
   );
 }
