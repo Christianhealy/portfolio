@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Reveal } from "@/components/portfolio/Reveal";
 
-export const Route = createFileRoute("/about")({
+export const Route = createFileRoute("/_site/about")({
   head: () => ({
     meta: [
       { title: "About — Atelier Noir" },

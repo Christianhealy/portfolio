@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ArrowUpRight } from "lucide-react";
 import { Reveal } from "@/components/portfolio/Reveal";
 
-export const Route = createFileRoute("/contact")({
+export const Route = createFileRoute("/_site/contact")({
   head: () => ({
     meta: [
       { title: "Contact — Atelier Noir" },
