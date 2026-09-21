@@ -117,8 +117,10 @@ function Index() {
                       className="w-full object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
                     />
                   ) : (
-                    <div className="flex aspect-video w-full items-center justify-center bg-secondary">
-                      <Play className="size-8 text-muted-foreground" />
+                    <div className="flex aspect-[4/3] w-full flex-col items-center justify-center gap-4 bg-gradient-to-b from-secondary to-card">
+                      <p className="px-6 text-center font-display text-2xl tracking-wide">
+                        {item.title}
+                      </p>
                     </div>
                   )}
 
