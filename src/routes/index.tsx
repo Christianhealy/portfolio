@@ -3,13 +3,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Atelier Noir — Photography & Cinematography" },
+      { title: "Christian Healy — Photography & Cinematography" },
       {
         name: "description",
         content:
           "Selected photography and cinematography work: portraits, landscapes, street and brand films.",
       },
-      { property: "og:title", content: "Atelier Noir — Photography & Cinematography" },
+      { property: "og:title", content: "Christian Healy — Photography & Cinematography" },
       {
         property: "og:description",
         content:

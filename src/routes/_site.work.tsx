@@ -4,10 +4,10 @@ import { PortfolioGallery } from "@/components/portfolio/PortfolioGallery";
 export const Route = createFileRoute("/_site/work")({
   head: () => ({
     meta: [
-      { title: "Selected Work — Atelier Noir" },
-      { name: "description", content: "Photography and cinematography selected work by Atelier Noir." },
-      { property: "og:title", content: "Selected Work — Atelier Noir" },
-      { property: "og:description", content: "Photography and cinematography selected work by Atelier Noir." },
+      { title: "Selected Work — Christian Healy" },
+      { name: "description", content: "Photography and cinematography selected work by Christian Healy." },
+      { property: "og:title", content: "Selected Work — Christian Healy" },
+      { property: "og:description", content: "Photography and cinematography selected work by Christian Healy." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
