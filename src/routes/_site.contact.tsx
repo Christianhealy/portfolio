@@ -6,9 +6,15 @@ export const Route = createFileRoute("/_site/contact")({
   head: () => ({
     meta: [
       { title: "Contact — Atelier Noir" },
-      { name: "description", content: "Contact Atelier Noir for photography and film commissions." },
+      {
+        name: "description",
+        content: "Contact Atelier Noir for photography and film commissions.",
+      },
       { property: "og:title", content: "Contact — Atelier Noir" },
-      { property: "og:description", content: "Contact Atelier Noir for photography and film commissions." },
+      {
+        property: "og:description",
+        content: "Contact Atelier Noir for photography and film commissions.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -24,7 +30,10 @@ function ContactPage() {
         <h1 className="mt-7 max-w-5xl font-display text-5xl leading-tight sm:text-7xl lg:text-8xl">
           Have a project in mind? Let’s make something memorable.
         </h1>
-        <a href="mailto:hello@ateliernoir.studio" className="mt-12 inline-flex items-center gap-3 border-b border-foreground pb-2 text-sm transition-opacity hover:opacity-60">
+        <a
+          href="mailto:hello@ateliernoir.studio"
+          className="mt-12 inline-flex items-center gap-3 border-b border-foreground pb-2 text-sm transition-opacity hover:opacity-60"
+        >
           hello@ateliernoir.studio <ArrowUpRight className="size-4" />
         </a>
       </Reveal>
