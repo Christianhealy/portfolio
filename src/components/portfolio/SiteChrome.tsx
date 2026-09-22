@@ -30,7 +30,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
             onClick={() => setOpen(false)}
             className="font-display text-xl uppercase tracking-[0.16em] transition-opacity hover:opacity-70 sm:text-2xl"
           >
-            Atelier Noir
+            Christian Healy
           </Link>
 
           <nav aria-label="Primary navigation" className="hidden items-center gap-8 sm:flex">
@@ -88,7 +88,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
       <footer className="mx-auto max-w-[1600px] border-t border-border/60 px-6 py-12 sm:px-12">
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <Link to="/" className="font-display text-base uppercase tracking-[0.16em]">
-            Atelier Noir
+            Christian Healy
           </Link>
           <a
             href="mailto:hello@ateliernoir.studio"
