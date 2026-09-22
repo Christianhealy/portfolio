@@ -5,10 +5,10 @@ import { Reveal } from "@/components/portfolio/Reveal";
 export const Route = createFileRoute("/_site/contact")({
   head: () => ({
     meta: [
-      { title: "Contact — Atelier Noir" },
-      { name: "description", content: "Contact Atelier Noir for photography and film commissions." },
-      { property: "og:title", content: "Contact — Atelier Noir" },
-      { property: "og:description", content: "Contact Atelier Noir for photography and film commissions." },
+      { title: "Contact — Christian Healy" },
+      { name: "description", content: "Contact Christian Healy for photography and film commissions." },
+      { property: "og:title", content: "Contact — Christian Healy" },
+      { property: "og:description", content: "Contact Christian Healy for photography and film commissions." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
