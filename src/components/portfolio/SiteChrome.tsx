@@ -1,3 +1,4 @@
+import { ScrambleLink } from "./ScrambleLink";
 import { Link } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
@@ -35,15 +36,14 @@ export function SiteChrome({ children }: { children: ReactNode }) {
 
           <nav aria-label="Primary navigation" className="hidden items-center gap-8 sm:flex">
             {links.map((link) => (
-              <Link
+              <ScrambleLink
+                label={link.label}
                 key={link.to}
                 to={link.to}
                 activeProps={{ className: "text-foreground" }}
                 inactiveProps={{ className: "text-muted-foreground" }}
                 className="text-[11px] uppercase tracking-[0.22em] transition-colors hover:text-foreground"
-              >
-                {link.label}
-              </Link>
+              />
             ))}
           </nav>
 
@@ -67,16 +67,15 @@ export function SiteChrome({ children }: { children: ReactNode }) {
           >
             <div className="flex flex-col gap-6">
               {links.map((link) => (
-                <Link
+                <ScrambleLink
+                  label={link.label}
                   key={link.to}
                   to={link.to}
                   onClick={() => setOpen(false)}
                   activeProps={{ className: "text-foreground" }}
                   inactiveProps={{ className: "text-muted-foreground" }}
                   className="font-display text-4xl uppercase transition-colors"
-                >
-                  {link.label}
-                </Link>
+                />
               ))}
             </div>
           </nav>
