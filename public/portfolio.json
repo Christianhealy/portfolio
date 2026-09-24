@@ -9,8 +9,9 @@
   {
     "id": "2",
     "type": "video",
-    "title": "Coastline — Short Film",
-    "mediaUrl": "https://www.youtube.com/embed/aqz-KE-bpKQ",
+    "title": "Ripples to Rapids: An Elwha River Restoration Story",
+    "mediaUrl": "https://vimeo.com/787810152",
+    "thumbnailUrl": "https://i.vimeocdn.com/video/1776449438-534262014787214a4c2d77e5a485255f10622ce603959ffdc2a98fe5dc41ef0e-d_1280?region=us",
     "category": "Cinematography"
   },
   {
@@ -30,8 +31,18 @@
   {
     "id": "5",
     "type": "video",
-    "title": "Atelier — Brand Film",
-    "mediaUrl": "https://player.vimeo.com/video/76979871",
+    "title": "Stir It Up",
+    "mediaUrl": "https://vimeo.com/799305936",
+    "thumbnailUrl": "https://i.vimeocdn.com/video/1611691207-3ddad593abfebb5ccfc4cc5d5048465c7f33f2f3f274843dfe2da04c2b5a3d0a-d_1280?region=us",
     "category": "Commercial"
+  },
+  {
+    "id": "6",
+    "type": "video",
+    "title": "Non Plus Ultra",
+    "description": "(This was filmed and edited within 48 hours)",
+    "mediaUrl": "https://vimeo.com/808131842",
+    "thumbnailUrl": "https://i.vimeocdn.com/video/1632310580-2404c67720d86d613380ef0259ad37ecec5bea5584a47aa8e47f9b1182955ce9-d_1280?region=us",
+    "category": "Film"
   }
 ]

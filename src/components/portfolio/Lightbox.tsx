@@ -2,13 +2,7 @@ import { useEffect } from "react";
 import { X } from "lucide-react";
 import { embedUrl, type PortfolioItem } from "./media";
 
-export function Lightbox({
-  item,
-  onClose,
-}: {
-  item: PortfolioItem | null;
-  onClose: () => void;
-}) {
+export function Lightbox({ item, onClose }: { item: PortfolioItem | null; onClose: () => void }) {
   useEffect(() => {
     if (!item) return;
     const onKey = (e: KeyboardEvent) => {
@@ -43,7 +37,7 @@ export function Lightbox({
 
       <div
         onClick={(e) => e.stopPropagation()}
-        className="lightbox-panel flex max-h-full w-full max-w-6xl flex-col items-center gap-5"
+        className="lightbox-panel flex max-h-full w-full max-w-6xl flex-col items-center gap-5 overflow-y-auto"
       >
         {item.type === "image" ? (
           <img
@@ -52,7 +46,7 @@ export function Lightbox({
             className="max-h-[78vh] w-auto max-w-full object-contain"
           />
         ) : (
-          <div className="aspect-video w-full bg-card">
+          <div className="aspect-video w-full shrink-0 bg-card">
             <iframe
               src={embedUrl(item.mediaUrl)}
               title={item.title}
@@ -62,11 +56,18 @@ export function Lightbox({
             />
           </div>
         )}
-        <div className="text-center">
+        <div className="w-full max-w-3xl shrink-0 px-4 pb-6 text-center">
           <h2 className="font-display text-xl tracking-wide text-foreground">{item.title}</h2>
-          <p className="mt-1 text-[11px] uppercase tracking-[0.3em] text-muted-foreground">
-            {item.category}
-          </p>
+          {item.description && (
+            <p className="mt-4 whitespace-pre-line text-sm leading-7 text-muted-foreground">
+              {item.description}
+            </p>
+          )}
+          {item.credits && (
+            <p className="mt-4 whitespace-pre-line text-xs leading-6 text-muted-foreground">
+              {item.credits}
+            </p>
+          )}
         </div>
       </div>
     </div>

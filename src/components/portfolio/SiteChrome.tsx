@@ -1,10 +1,12 @@
+import { ScrambleLink } from "./ScrambleLink";
 import { Link } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 
 const links = [
-  { to: "/work" as const, label: "Work" },
+  { to: "/stills" as const, label: "Stills" },
+  { to: "/motion" as const, label: "Motion" },
   { to: "/about" as const, label: "About" },
   { to: "/contact" as const, label: "Contact" },
 ];
@@ -24,7 +26,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="relative z-40 mx-auto max-w-[1600px] px-6 pt-7 sm:px-12 sm:pt-10">
-        <div className="flex min-h-14 items-center justify-between border-b border-border/60 pb-5">
+        <div className="flex min-h-14 items-center justify-between pb-5">
           <Link
             to="/"
             onClick={() => setOpen(false)}
@@ -35,15 +37,14 @@ export function SiteChrome({ children }: { children: ReactNode }) {
 
           <nav aria-label="Primary navigation" className="hidden items-center gap-8 sm:flex">
             {links.map((link) => (
-              <Link
+              <ScrambleLink
+                label={link.label}
                 key={link.to}
                 to={link.to}
                 activeProps={{ className: "text-foreground" }}
                 inactiveProps={{ className: "text-muted-foreground" }}
                 className="text-[11px] uppercase tracking-[0.22em] transition-colors hover:text-foreground"
-              >
-                {link.label}
-              </Link>
+              />
             ))}
           </nav>
 
@@ -63,20 +64,19 @@ export function SiteChrome({ children }: { children: ReactNode }) {
         {open && (
           <nav
             aria-label="Mobile navigation"
-            className="absolute inset-x-6 top-full border-b border-border bg-background py-8 sm:hidden"
+            className="absolute inset-x-6 top-full bg-background py-8 sm:hidden"
           >
             <div className="flex flex-col gap-6">
               {links.map((link) => (
-                <Link
+                <ScrambleLink
+                  label={link.label}
                   key={link.to}
                   to={link.to}
                   onClick={() => setOpen(false)}
                   activeProps={{ className: "text-foreground" }}
                   inactiveProps={{ className: "text-muted-foreground" }}
                   className="font-display text-4xl uppercase transition-colors"
-                >
-                  {link.label}
-                </Link>
+                />
               ))}
             </div>
           </nav>
