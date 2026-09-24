@@ -29,7 +29,7 @@ function Index() {
     <main className="flex h-screen w-screen items-center justify-center overflow-hidden bg-background px-6">
       <ScrambleLink
         label="Enter"
-        to="/work"
+        to="/motion"
         className="group relative inline-flex items-center justify-center border border-foreground px-12 py-4 text-[11px] uppercase tracking-[0.22em] text-foreground transition-colors duration-300 hover:bg-foreground hover:text-background"
       />
     </main>

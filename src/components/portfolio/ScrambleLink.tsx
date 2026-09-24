@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 
 type ScrambleLinkProps = {
-  to: "/" | "/work" | "/about" | "/contact";
+  to: "/" | "/stills" | "/motion" | "/about" | "/contact";
   label: string;
   className?: string;
   activeProps?: { className: string };

@@ -13,6 +13,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SiteRouteImport } from './routes/_site'
 import { Route as SiteAboutRouteImport } from './routes/_site.about'
 import { Route as SiteContactRouteImport } from './routes/_site.contact'
+import { Route as SiteMotionRouteImport } from './routes/_site.motion'
+import { Route as SiteStillsRouteImport } from './routes/_site.stills'
 import { Route as SiteWorkRouteImport } from './routes/_site.work'
 
 const IndexRoute = IndexRouteImport.update({
@@ -34,6 +36,16 @@ const SiteContactRoute = SiteContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => SiteRoute,
 } as any)
+const SiteMotionRoute = SiteMotionRouteImport.update({
+  id: '/motion',
+  path: '/motion',
+  getParentRoute: () => SiteRoute,
+} as any)
+const SiteStillsRoute = SiteStillsRouteImport.update({
+  id: '/stills',
+  path: '/stills',
+  getParentRoute: () => SiteRoute,
+} as any)
 const SiteWorkRoute = SiteWorkRouteImport.update({
   id: '/work',
   path: '/work',
@@ -44,12 +56,16 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof SiteAboutRoute
   '/contact': typeof SiteContactRoute
+  '/motion': typeof SiteMotionRoute
+  '/stills': typeof SiteStillsRoute
   '/work': typeof SiteWorkRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof SiteAboutRoute
   '/contact': typeof SiteContactRoute
+  '/motion': typeof SiteMotionRoute
+  '/stills': typeof SiteStillsRoute
   '/work': typeof SiteWorkRoute
 }
 export interface FileRoutesById {
@@ -58,19 +74,23 @@ export interface FileRoutesById {
   '/_site': typeof SiteRouteWithChildren
   '/_site/about': typeof SiteAboutRoute
   '/_site/contact': typeof SiteContactRoute
+  '/_site/motion': typeof SiteMotionRoute
+  '/_site/stills': typeof SiteStillsRoute
   '/_site/work': typeof SiteWorkRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/contact' | '/work'
+  fullPaths: '/' | '/about' | '/contact' | '/motion' | '/stills' | '/work'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/contact' | '/work'
+  to: '/' | '/about' | '/contact' | '/motion' | '/stills' | '/work'
   id:
     | '__root__'
     | '/'
     | '/_site'
     | '/_site/about'
     | '/_site/contact'
+    | '/_site/motion'
+    | '/_site/stills'
     | '/_site/work'
   fileRoutesById: FileRoutesById
 }
@@ -109,6 +129,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SiteContactRouteImport
       parentRoute: typeof SiteRoute
     }
+    '/_site/motion': {
+      id: '/_site/motion'
+      path: '/motion'
+      fullPath: '/motion'
+      preLoaderRoute: typeof SiteMotionRouteImport
+      parentRoute: typeof SiteRoute
+    }
+    '/_site/stills': {
+      id: '/_site/stills'
+      path: '/stills'
+      fullPath: '/stills'
+      preLoaderRoute: typeof SiteStillsRouteImport
+      parentRoute: typeof SiteRoute
+    }
     '/_site/work': {
       id: '/_site/work'
       path: '/work'
@@ -122,12 +156,16 @@ declare module '@tanstack/react-router' {
 interface SiteRouteChildren {
   SiteAboutRoute: typeof SiteAboutRoute
   SiteContactRoute: typeof SiteContactRoute
+  SiteMotionRoute: typeof SiteMotionRoute
+  SiteStillsRoute: typeof SiteStillsRoute
   SiteWorkRoute: typeof SiteWorkRoute
 }
 
 const SiteRouteChildren: SiteRouteChildren = {
   SiteAboutRoute: SiteAboutRoute,
   SiteContactRoute: SiteContactRoute,
+  SiteMotionRoute: SiteMotionRoute,
+  SiteStillsRoute: SiteStillsRoute,
   SiteWorkRoute: SiteWorkRoute,
 }
 
