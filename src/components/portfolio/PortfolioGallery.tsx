@@ -87,10 +87,7 @@ export function PortfolioGallery({ mediaType }: { mediaType: MediaType }) {
                     </div>
                   )}
                   {previewId === item.id && previewUrl && !active && (
-                    <VimeoPreview
-                      src={previewUrl}
-                      title={item.title}
-                    />
+                    <VimeoPreview src={previewUrl} title={item.title} />
                   )}
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/85 via-background/10 to-transparent opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
                   {item.type === "video" && !(previewId === item.id && previewUrl) && (

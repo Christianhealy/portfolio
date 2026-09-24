@@ -23,8 +23,7 @@ export function vimeoEmbedUrl(value: string, preview = false): string | null {
     if (hash) target.searchParams.set("h", hash);
     target.searchParams.set("autoplay", "1");
     if (preview) {
-      for (const key of ["muted", "loop", "playsinline"])
-        target.searchParams.set(key, "1");
+      for (const key of ["muted", "loop", "playsinline"]) target.searchParams.set(key, "1");
       target.searchParams.set("controls", "0");
     }
     return target.toString();
