@@ -1,6 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-// TEMPORARY build check: confirms vite-imagetools (sharp) works in Lovable's build. Remove after.
-import imagetoolsCheck from "@/content/hero/photo1.jpg?w=640&format=avif";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -33,7 +31,6 @@ function Index() {
       >
         Enter
       </Link>
-      <img src={imagetoolsCheck} alt="" hidden data-imagetools-check />
     </main>
   );
 }
