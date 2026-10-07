@@ -2,15 +2,13 @@ import { Link } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
+import { getAbout } from "@/lib/content";
 
-const links = [
-  { to: "/work" as const, label: "Work" },
-  { to: "/about" as const, label: "About" },
-  { to: "/contact" as const, label: "Contact" },
-];
+const links = [{ to: "/about" as const, label: "About" }];
 
 export function SiteChrome({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
+  const { email } = getAbout();
 
   useEffect(() => {
     if (!open) return;
@@ -90,12 +88,14 @@ export function SiteChrome({ children }: { children: ReactNode }) {
           <Link to="/" className="font-display text-base uppercase tracking-[0.16em]">
             Christian Healy
           </Link>
-          <a
-            href="mailto:hello@ateliernoir.studio"
-            className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground"
-          >
-            hello@ateliernoir.studio
-          </a>
+          {email && (
+            <a
+              href={`mailto:${email}`}
+              className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground"
+            >
+              {email}
+            </a>
+          )}
         </div>
       </footer>
     </div>

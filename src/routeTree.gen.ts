@@ -12,8 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SiteRouteImport } from './routes/_site'
 import { Route as SiteAboutRouteImport } from './routes/_site.about'
-import { Route as SiteContactRouteImport } from './routes/_site.contact'
-import { Route as SiteWorkRouteImport } from './routes/_site.work'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -29,49 +27,27 @@ const SiteAboutRoute = SiteAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => SiteRoute,
 } as any)
-const SiteContactRoute = SiteContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
-  getParentRoute: () => SiteRoute,
-} as any)
-const SiteWorkRoute = SiteWorkRouteImport.update({
-  id: '/work',
-  path: '/work',
-  getParentRoute: () => SiteRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof SiteAboutRoute
-  '/contact': typeof SiteContactRoute
-  '/work': typeof SiteWorkRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof SiteAboutRoute
-  '/contact': typeof SiteContactRoute
-  '/work': typeof SiteWorkRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_site': typeof SiteRouteWithChildren
   '/_site/about': typeof SiteAboutRoute
-  '/_site/contact': typeof SiteContactRoute
-  '/_site/work': typeof SiteWorkRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/contact' | '/work'
+  fullPaths: '/' | '/about'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/contact' | '/work'
-  id:
-    | '__root__'
-    | '/'
-    | '/_site'
-    | '/_site/about'
-    | '/_site/contact'
-    | '/_site/work'
+  to: '/' | '/about'
+  id: '__root__' | '/' | '/_site' | '/_site/about'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -102,33 +78,15 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SiteAboutRouteImport
       parentRoute: typeof SiteRoute
     }
-    '/_site/contact': {
-      id: '/_site/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof SiteContactRouteImport
-      parentRoute: typeof SiteRoute
-    }
-    '/_site/work': {
-      id: '/_site/work'
-      path: '/work'
-      fullPath: '/work'
-      preLoaderRoute: typeof SiteWorkRouteImport
-      parentRoute: typeof SiteRoute
-    }
   }
 }
 
 interface SiteRouteChildren {
   SiteAboutRoute: typeof SiteAboutRoute
-  SiteContactRoute: typeof SiteContactRoute
-  SiteWorkRoute: typeof SiteWorkRoute
 }
 
 const SiteRouteChildren: SiteRouteChildren = {
   SiteAboutRoute: SiteAboutRoute,
-  SiteContactRoute: SiteContactRoute,
-  SiteWorkRoute: SiteWorkRoute,
 }
 
 const SiteRouteWithChildren = SiteRoute._addFileChildren(SiteRouteChildren)
