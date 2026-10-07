@@ -1,6 +1,8 @@
+import { Reveal } from "@/components/motion/Reveal";
+import { REVEAL_STAGGER } from "@/components/motion/tokens";
 import type { Still } from "@/lib/content";
-import { distribute } from "./masonry";
 import { stillAlt } from "./alt";
+import { distribute } from "./masonry";
 import { Picture } from "./Picture";
 
 // One layout per breakpoint, computed from intrinsic sizes so server and browser agree and
@@ -29,22 +31,24 @@ export function MasonryGrid({ stills, onOpen }: Props) {
               {column.map((index) => {
                 const still = stills[index]!;
                 return (
-                  <button
-                    key={still.slug}
-                    type="button"
-                    data-slug={still.slug}
-                    aria-label={`Open ${stillAlt(still)}`}
-                    onClick={() => onOpen(index)}
-                    className="block w-full cursor-zoom-in bg-card"
-                  >
-                    <Picture
-                      image={still.image}
-                      alt={stillAlt(still)}
-                      sizes={SIZES}
-                      loading={index < columns ? "eager" : "lazy"}
-                      className="block h-auto w-full"
-                    />
-                  </button>
+                  <Reveal key={still.slug} delay={c * REVEAL_STAGGER}>
+                    <button
+                      type="button"
+                      data-slug={still.slug}
+                      aria-label={`Open ${stillAlt(still)}`}
+                      onClick={() => onOpen(index)}
+                      className="block w-full cursor-zoom-in bg-card"
+                    >
+                      <Picture
+                        image={still.image}
+                        alt={stillAlt(still)}
+                        sizes={SIZES}
+                        loading={index < columns ? "eager" : "lazy"}
+                        fadeIn
+                        className="fade-in-image block h-auto w-full"
+                      />
+                    </button>
+                  </Reveal>
                 );
               })}
             </div>

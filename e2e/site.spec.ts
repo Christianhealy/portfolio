@@ -171,3 +171,39 @@ test.describe("navigation", () => {
     }
   });
 });
+
+// Everything above runs with reduced motion forced; make sure the full-motion paths (zoom,
+// slide, view transitions, Lenis) also work and stay error-free.
+test.describe("full motion", () => {
+  test.use({ reducedMotion: "no-preference" });
+
+  test("lightbox zooms open, slides, and zooms closed", async ({ page }) => {
+    await page.goto("/stills");
+    await page.getByRole("button", { name: "Open dunes" }).click();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog.getByText("01 / 04")).toBeVisible();
+    await page.keyboard.press("ArrowRight");
+    await expect(dialog.getByText("02 / 04")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(dialog).toBeHidden();
+    await expect(page).toHaveURL(/\/stills$/);
+  });
+
+  test("splash enters the site and pages transition", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("link", { name: "Enter" }).click();
+    await expect(page).toHaveURL(/\/stills$/);
+    await page.goto("/film");
+    await page.getByRole("link", { name: /First Film/ }).click();
+    await expect(page.getByRole("heading", { name: "First Film", level: 1 })).toBeVisible();
+  });
+
+  test("about page renders with parallax and reveals", async ({ page }) => {
+    await page.goto("/about");
+    await expect(page.getByRole("heading", { name: "Christian Healy", level: 1 })).toBeVisible();
+    await page.mouse.wheel(0, 1500);
+    await expect(
+      page.locator("main").getByRole("link", { name: "hello@example.com" }),
+    ).toBeVisible();
+  });
+});

@@ -38,7 +38,7 @@ export function SiteHeader() {
         className="site-header-blur absolute inset-0 bg-background/80 backdrop-blur-md"
         data-visible={scrolled ? "" : undefined}
       />
-      <div className="relative mx-auto flex h-16 max-w-[1600px] items-center justify-between px-6 sm:h-20 sm:px-12">
+      <div className="relative z-10 mx-auto flex h-16 max-w-[1600px] items-center justify-between px-6 sm:h-20 sm:px-12">
         <Link
           to="/stills"
           onClick={() => setOpen(false)}
@@ -75,6 +75,7 @@ export function SiteHeader() {
       {open && (
         <nav
           aria-label="Primary"
+          data-lenis-prevent=""
           className="fixed inset-0 flex flex-col justify-center gap-6 bg-background px-6 sm:hidden"
         >
           {links.map((link) => (

@@ -40,7 +40,7 @@ function FilmDetail() {
 
   return (
     <main className="mx-auto max-w-[1600px] px-6 pb-16 pt-8 sm:px-12 sm:pt-12">
-      <div className="aspect-video w-full bg-foreground">
+      <div data-lenis-prevent="" className="aspect-video w-full bg-foreground">
         <iframe
           src={vimeoPlayerUrl({
             id: film.vimeoId,

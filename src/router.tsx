@@ -1,5 +1,6 @@
 import { QueryClient } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
+import { pageTransitionTypes } from "./components/motion/pageTransition";
 import { routeTree } from "./routeTree.gen";
 
 export const getRouter = () => {
@@ -9,6 +10,7 @@ export const getRouter = () => {
     routeTree,
     context: { queryClient },
     scrollRestoration: true,
+    defaultViewTransition: { types: pageTransitionTypes },
     defaultPreloadStaleTime: 0,
   });
 

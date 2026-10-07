@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Parallax } from "@/components/motion/Parallax";
+import { Reveal } from "@/components/motion/Reveal";
 import { Picture } from "@/components/portfolio/Picture";
 import { getAbout } from "@/lib/content";
 
@@ -25,12 +27,14 @@ function AboutPage() {
   return (
     <main className="mx-auto grid max-w-[1600px] gap-12 px-6 py-12 sm:px-12 sm:py-20 lg:grid-cols-[1fr_1fr] lg:gap-20">
       {about.portrait && (
-        <Picture
-          image={about.portrait}
-          alt="Portrait of Christian Healy"
-          sizes="(min-width: 1024px) 50vw, 100vw"
-          className="block h-auto w-full"
-        />
+        <Parallax>
+          <Picture
+            image={about.portrait}
+            alt="Portrait of Christian Healy"
+            sizes="(min-width: 1024px) 50vw, 100vw"
+            className="block h-auto w-full"
+          />
+        </Parallax>
       )}
       <div className="lg:pt-8">
         <p className={label}>About</p>
@@ -41,7 +45,7 @@ function AboutPage() {
           dangerouslySetInnerHTML={{ __html: about.bioHtml }}
         />
         {(about.email || about.instagram || about.vimeo) && (
-          <div className="mt-12">
+          <Reveal className="mt-12">
             <p className={label}>Contact</p>
             <ul className="mt-4 space-y-3 text-sm">
               {about.email && (
@@ -66,7 +70,7 @@ function AboutPage() {
                 </li>
               )}
             </ul>
-          </div>
+          </Reveal>
         )}
       </div>
     </main>
