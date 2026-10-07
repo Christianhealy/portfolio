@@ -1,0 +1,44 @@
+name: Check
+
+# `bun run check` (lint → typecheck → unit → build → e2e + visual) on every pull request and
+# on pushes to main. Runs inside the official Playwright image so the Linux screenshot
+# baselines (e2e/visual.spec.ts-snapshots/*-linux.png) match exactly.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    # Keep in step with @playwright/test in package.json.
+    container: mcr.microsoft.com/playwright:v1.63.0-noble
+    env:
+      CI: "true"
+      WRANGLER_SEND_METRICS: "false"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+
+      - run: bun install --frozen-lockfile
+
+      - run: bun run check
+
+      - name: Upload Playwright results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results
+          path: test-results/
+          retention-days: 7
