@@ -1,7 +1,7 @@
 // Pure parsers for the plain-text content files. No filesystem access here — the glob layer
 // (./index.ts) hands these functions raw strings so they stay trivially testable.
 import { marked } from "marked";
-import { parseVimeoId } from "../vimeo";
+import { parseVimeo } from "../vimeo";
 import { slugFromFilename } from "./filenames";
 
 export interface Credit {
@@ -13,6 +13,7 @@ export interface Film {
   slug: string;
   filename: string;
   vimeoId: string;
+  vimeoHash?: string;
   client?: string;
   title?: string;
   year?: string;
@@ -63,10 +64,17 @@ export function parseFilm(filename: string, text: string): Film {
   const { data, body } = parseFrontMatter(text);
   const raw = data["vimeo"];
   if (!raw) throw new Error(`${filename}: missing "vimeo:" line (paste the Vimeo link).`);
-  const vimeoId = parseVimeoId(raw);
-  if (!vimeoId) throw new Error(`${filename}: "${raw}" doesn't look like a Vimeo link.`);
+  const ref = parseVimeo(raw);
+  if (!ref) throw new Error(`${filename}: "${raw}" doesn't look like a Vimeo link.`);
   const { description, credits } = splitCredits(body);
-  const film: Film = { slug: slugFromFilename(filename), filename, vimeoId, description, credits };
+  const film: Film = {
+    slug: slugFromFilename(filename),
+    filename,
+    vimeoId: ref.id,
+    description,
+    credits,
+  };
+  if (ref.hash) film.vimeoHash = ref.hash;
   if (data["client"]) film.client = data["client"];
   if (data["title"]) film.title = data["title"];
   if (data["year"]) film.year = data["year"];

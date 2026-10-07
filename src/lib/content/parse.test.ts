@@ -90,3 +90,10 @@ describe("parseAbout", () => {
     expect(about.bioHtml).toContain("<strong>world</strong>");
   });
 });
+
+describe("parseFilm unlisted videos", () => {
+  it("keeps the private-link hash", () => {
+    const film = parseFilm("a.md", "---\nvimeo: https://vimeo.com/123/abc99\n---\n");
+    expect(film).toMatchObject({ vimeoId: "123", vimeoHash: "abc99" });
+  });
+});

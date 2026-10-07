@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { SiteChrome } from "@/components/portfolio/SiteChrome";
+import { SiteFooter } from "@/components/portfolio/SiteFooter";
+import { SiteHeader } from "@/components/portfolio/SiteHeader";
 
 export const Route = createFileRoute("/_site")({
   component: SiteLayout,
@@ -7,8 +8,12 @@ export const Route = createFileRoute("/_site")({
 
 function SiteLayout() {
   return (
-    <SiteChrome>
-      <Outlet />
-    </SiteChrome>
+    <div className="flex min-h-screen flex-col bg-background text-foreground">
+      <SiteHeader />
+      <div className="flex-1 pt-16 sm:pt-20">
+        <Outlet />
+      </div>
+      <SiteFooter />
+    </div>
   );
 }

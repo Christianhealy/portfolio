@@ -1,18 +1,40 @@
 import type { FilmEntry, ResponsiveImage } from "./content/types";
 
+export interface VimeoRef {
+  id: string;
+  /** Private-link hash; unlisted videos only play (and resolve in oEmbed) with it. */
+  hash?: string;
+}
+
 // Accepts anything a person might paste: a bare id, vimeo.com/<id>, vimeo.com/<id>/<hash>,
-// player.vimeo.com/video/<id>, or channel/group urls ending in an id.
-export function parseVimeoId(input: string): string | null {
+// player.vimeo.com/video/<id>?h=<hash>, or channel/group urls ending in an id.
+export function parseVimeo(input: string): VimeoRef | null {
   const value = input.trim();
-  if (/^\d+$/.test(value)) return value;
+  if (/^\d+$/.test(value)) return { id: value };
   if (!/(^|\/\/|\.)vimeo\.com\//i.test(value)) return null;
-  const path = value.replace(/^[a-z]+:\/\//i, "").split(/[?#]/)[0] ?? "";
+  const [path = "", query = ""] = value.replace(/^[a-z]+:\/\//i, "").split(/[?#]/);
   const segments = path.split("/").slice(1);
   const playerIndex = segments.indexOf("video");
-  if (playerIndex >= 0) return segments[playerIndex + 1]?.match(/^\d+$/)?.[0] ?? null;
-  // The id is the first numeric segment; anything after it is a private-link hash.
-  const numeric = segments.filter((s) => /^\d+$/.test(s));
-  return numeric[0] ?? null;
+  // The id is the first numeric segment (after /video/ for player urls).
+  const index =
+    playerIndex >= 0
+      ? /^\d+$/.test(segments[playerIndex + 1] ?? "")
+        ? playerIndex + 1
+        : -1
+      : segments.findIndex((s) => /^\d+$/.test(s));
+  const id = segments[index];
+  if (index < 0 || !id) return null;
+  const hash =
+    /(?:^|&)h=([0-9a-z]+)/i.exec(query)?.[1] ?? segments[index + 1]?.match(/^[0-9a-z]+$/i)?.[0];
+  return hash ? { id, hash } : { id };
+}
+
+export function parseVimeoId(input: string): string | null {
+  return parseVimeo(input)?.id ?? null;
+}
+
+export function vimeoPlayerUrl({ id, hash }: VimeoRef): string {
+  return `https://player.vimeo.com/video/${id}?${hash ? `h=${hash}&` : ""}dnt=1`;
 }
 
 export interface VimeoMeta {
@@ -30,8 +52,9 @@ const FAILURE_TTL = 5 * 60 * 1000;
 export function createOEmbedClient(fetchFn: Fetch, { now = Date.now } = {}) {
   const cache = new Map<string, { value: VimeoMeta | null; expires: number }>();
 
-  async function lookup(id: string): Promise<VimeoMeta | null> {
-    const url = `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(`https://vimeo.com/${id}`)}&width=1280`;
+  async function lookup(id: string, hash?: string): Promise<VimeoMeta | null> {
+    const video = `https://vimeo.com/${id}${hash ? `/${hash}` : ""}`;
+    const url = `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(video)}&width=1280`;
     try {
       const response = await fetchFn(url, { signal: AbortSignal.timeout(4000) });
       if (!response.ok) return null;
@@ -49,11 +72,12 @@ export function createOEmbedClient(fetchFn: Fetch, { now = Date.now } = {}) {
   }
 
   return {
-    async get(id: string): Promise<VimeoMeta | null> {
-      const hit = cache.get(id);
+    async get(id: string, hash?: string): Promise<VimeoMeta | null> {
+      const key = `${id}/${hash ?? ""}`;
+      const hit = cache.get(key);
       if (hit && hit.expires > now()) return hit.value;
-      const value = await lookup(id);
-      cache.set(id, { value, expires: now() + (value ? SUCCESS_TTL : FAILURE_TTL) });
+      const value = await lookup(id, hash);
+      cache.set(key, { value, expires: now() + (value ? SUCCESS_TTL : FAILURE_TTL) });
       return value;
     },
   };
@@ -76,4 +100,8 @@ export function filmImage(film: FilmEntry, meta: VimeoMeta | null): FilmImage {
   if (film.poster) return { kind: "poster", image: film.poster };
   if (meta?.thumbnail) return { kind: "thumbnail", ...meta.thumbnail };
   return { kind: "card" };
+}
+
+export function filmRefs(films: FilmEntry[]): VimeoRef[] {
+  return films.map((f) => (f.vimeoHash ? { id: f.vimeoId, hash: f.vimeoHash } : { id: f.vimeoId }));
 }

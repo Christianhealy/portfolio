@@ -11,7 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SiteRouteImport } from './routes/_site'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as WorkRouteImport } from './routes/work'
 import { Route as SiteAboutRouteImport } from './routes/_site.about'
+import { Route as SiteStillsRouteImport } from './routes/_site.stills'
+import { Route as SiteFilmIndexRouteImport } from './routes/_site.film.index'
+import { Route as SiteFilmSlugRouteImport } from './routes/_site.film.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,37 +27,90 @@ const SiteRoute = SiteRouteImport.update({
   id: '/_site',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorkRoute = WorkRouteImport.update({
+  id: '/work',
+  path: '/work',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SiteAboutRoute = SiteAboutRouteImport.update({
   id: '/about',
   path: '/about',
   getParentRoute: () => SiteRoute,
 } as any)
+const SiteStillsRoute = SiteStillsRouteImport.update({
+  id: '/stills',
+  path: '/stills',
+  getParentRoute: () => SiteRoute,
+} as any)
+const SiteFilmIndexRoute = SiteFilmIndexRouteImport.update({
+  id: '/film/',
+  path: '/film/',
+  getParentRoute: () => SiteRoute,
+} as any)
+const SiteFilmSlugRoute = SiteFilmSlugRouteImport.update({
+  id: '/film/$slug',
+  path: '/film/$slug',
+  getParentRoute: () => SiteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/contact': typeof ContactRoute
+  '/work': typeof WorkRoute
   '/about': typeof SiteAboutRoute
+  '/stills': typeof SiteStillsRoute
+  '/film/$slug': typeof SiteFilmSlugRoute
+  '/film/': typeof SiteFilmIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/contact': typeof ContactRoute
+  '/work': typeof WorkRoute
   '/about': typeof SiteAboutRoute
+  '/stills': typeof SiteStillsRoute
+  '/film/$slug': typeof SiteFilmSlugRoute
+  '/film': typeof SiteFilmIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_site': typeof SiteRouteWithChildren
+  '/contact': typeof ContactRoute
+  '/work': typeof WorkRoute
   '/_site/about': typeof SiteAboutRoute
+  '/_site/stills': typeof SiteStillsRoute
+  '/_site/film/$slug': typeof SiteFilmSlugRoute
+  '/_site/film/': typeof SiteFilmIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about'
+  fullPaths:
+    '/' | '/contact' | '/work' | '/about' | '/stills' | '/film/$slug' | '/film/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about'
-  id: '__root__' | '/' | '/_site' | '/_site/about'
+  to:
+    '/' | '/contact' | '/work' | '/about' | '/stills' | '/film/$slug' | '/film'
+  id:
+    | '__root__'
+    | '/'
+    | '/_site'
+    | '/contact'
+    | '/work'
+    | '/_site/about'
+    | '/_site/stills'
+    | '/_site/film/$slug'
+    | '/_site/film/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SiteRoute: typeof SiteRouteWithChildren
+  ContactRoute: typeof ContactRoute
+  WorkRoute: typeof WorkRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -71,6 +129,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SiteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/work': {
+      id: '/work'
+      path: '/work'
+      fullPath: '/work'
+      preLoaderRoute: typeof WorkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_site/about': {
       id: '/_site/about'
       path: '/about'
@@ -78,15 +150,42 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SiteAboutRouteImport
       parentRoute: typeof SiteRoute
     }
+    '/_site/stills': {
+      id: '/_site/stills'
+      path: '/stills'
+      fullPath: '/stills'
+      preLoaderRoute: typeof SiteStillsRouteImport
+      parentRoute: typeof SiteRoute
+    }
+    '/_site/film/': {
+      id: '/_site/film/'
+      path: '/film'
+      fullPath: '/film/'
+      preLoaderRoute: typeof SiteFilmIndexRouteImport
+      parentRoute: typeof SiteRoute
+    }
+    '/_site/film/$slug': {
+      id: '/_site/film/$slug'
+      path: '/film/$slug'
+      fullPath: '/film/$slug'
+      preLoaderRoute: typeof SiteFilmSlugRouteImport
+      parentRoute: typeof SiteRoute
+    }
   }
 }
 
 interface SiteRouteChildren {
   SiteAboutRoute: typeof SiteAboutRoute
+  SiteStillsRoute: typeof SiteStillsRoute
+  SiteFilmSlugRoute: typeof SiteFilmSlugRoute
+  SiteFilmIndexRoute: typeof SiteFilmIndexRoute
 }
 
 const SiteRouteChildren: SiteRouteChildren = {
   SiteAboutRoute: SiteAboutRoute,
+  SiteStillsRoute: SiteStillsRoute,
+  SiteFilmSlugRoute: SiteFilmSlugRoute,
+  SiteFilmIndexRoute: SiteFilmIndexRoute,
 }
 
 const SiteRouteWithChildren = SiteRoute._addFileChildren(SiteRouteChildren)
@@ -94,6 +193,8 @@ const SiteRouteWithChildren = SiteRoute._addFileChildren(SiteRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SiteRoute: SiteRouteWithChildren,
+  ContactRoute: ContactRoute,
+  WorkRoute: WorkRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
