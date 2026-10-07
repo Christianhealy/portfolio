@@ -2,13 +2,7 @@ import { useEffect } from "react";
 import { X } from "lucide-react";
 import { embedUrl, type PortfolioItem } from "./media";
 
-export function Lightbox({
-  item,
-  onClose,
-}: {
-  item: PortfolioItem | null;
-  onClose: () => void;
-}) {
+export function Lightbox({ item, onClose }: { item: PortfolioItem | null; onClose: () => void }) {
   useEffect(() => {
     if (!item) return;
     const onKey = (e: KeyboardEvent) => {
