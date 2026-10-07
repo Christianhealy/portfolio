@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bun install*)",
+      "Bash(bun add *)",
+      "Bash(bun run build*)",
+      "Bash(bun run dev*)",
+      "Bash(bun run preview*)",
+      "Bash(bun run test*)",
+      "Bash(bun run check*)",
+      "Bash(bun run lint*)",
+      "Bash(bunx playwright *)",
+      "Bash(bunx vitest *)",
+      "Bash(bunx tsc *)",
+      "Bash(~/.bun/bin/bun install*)",
+      "Bash(~/.bun/bin/bun add *)",
+      "Bash(~/.bun/bin/bun run build*)",
+      "Bash(~/.bun/bin/bun run dev*)",
+      "Bash(~/.bun/bin/bun run preview*)",
+      "Bash(~/.bun/bin/bun run test*)",
+      "Bash(~/.bun/bin/bun run check*)",
+      "Bash(~/.bun/bin/bun run lint*)",
+      "Bash(~/.bun/bin/bunx playwright *)",
+      "Bash(~/.bun/bin/bunx vitest *)",
+      "Bash(~/.bun/bin/bunx tsc *)"
+    ]
+  }
+}
