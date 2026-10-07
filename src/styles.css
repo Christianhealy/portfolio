@@ -142,6 +142,11 @@
     border-color: var(--color-border);
   }
 
+  :focus-visible {
+    outline: 1px solid currentColor;
+    outline-offset: 4px;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);

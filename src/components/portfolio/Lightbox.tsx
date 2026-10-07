@@ -175,15 +175,15 @@ export function Lightbox({ stills, index, onIndexChange, onClose, getOrigin }: P
         </button>
       </div>
 
-      <div className="relative flex min-h-0 flex-1 items-center justify-center px-4 sm:px-20">
+      <div className="relative min-h-0 flex-1">
         <Picture
           key={still.slug}
           ref={image}
           image={still.image}
           alt={alt}
           sizes="100vw"
-          pictureClassName="contents"
-          className="max-h-full w-auto max-w-full object-contain"
+          pictureClassName="absolute inset-x-4 inset-y-0 sm:inset-x-20"
+          className="absolute inset-0 m-auto h-auto max-h-full w-auto max-w-full"
           data-lightbox-image=""
         />
         <button
