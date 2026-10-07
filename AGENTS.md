@@ -48,10 +48,15 @@ task complete until `bun run check` passes.
 - **E2E server:** Playwright builds with fixtures and serves `.output/` via `wrangler dev`
   (the same workerd runtime as production). `vite preview` cannot serve the nitro
   cloudflare-module output.
-- **Visual baselines** are per platform (`e2e/visual.spec.ts-snapshots/*-darwin.png`,
-  `*-linux.png`). After an intentional visual change, regenerate with
-  `bun run test:e2e e2e/visual.spec.ts --update-snapshots=all` and look at the images before
-  committing. Plain `--update-snapshots` skips diffs that fall within tolerance.
+- **Visual baselines** are per platform (`e2e/visual.spec.ts-snapshots/*-darwin.png` locally,
+  `*-linux.png` for CI). After an intentional visual change, regenerate macOS ones with
+  `bun run test:e2e e2e/visual.spec.ts --update-snapshots=all` and Linux ones with
+  `bash scripts/update-linux-snapshots.sh` (needs Docker; uses the same Playwright image as CI).
+  Look at the images before committing. Plain `--update-snapshots` skips diffs that fall
+  within tolerance. **Linux baselines have not been generated yet**, so CI visual tests fail
+  until they are.
+- **CI:** `.github/workflows/check.yml` runs `bun run check` on pull requests and pushes to
+  `main`, inside `mcr.microsoft.com/playwright` (keep its tag in step with `@playwright/test`).
 - **Motion:** every decision goes through `useMotionPrefs()`; reduced motion means
   ≤ 200 ms opacity fades only. Shared easing/durations are in
   `src/components/motion/tokens.ts` and mirrored as CSS variables in `src/styles.css`.

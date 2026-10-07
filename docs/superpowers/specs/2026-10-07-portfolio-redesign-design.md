@@ -1,7 +1,7 @@
 # Portfolio Redesign — Design Spec
 
 Date: 2026-10-07
-Status: Draft for review
+Status: Approved; implemented on this branch (see §10 for decisions made during implementation)
 Branch: `feat/portfolio-redesign`
 
 ## 1. Intent
@@ -241,7 +241,7 @@ it.
 |---|---|---|
 | Unit | Vitest | ordering, slugs, captions, film/about parsing, Vimeo parsing, every guardrail, oEmbed fallback |
 | Component | Vitest + Testing Library (jsdom) | Lightbox keys/Esc/focus/counter/URL; FilmTile poster vs loop + reduced motion; `useMotionPrefs` switches |
-| E2E | Playwright vs `vite preview` | splash → Enter → stills; lightbox open/nav/close/deep-link; film list → film page with Vimeo iframe; about renders; redirects; no console errors; CLS ≈ 0 on `/stills` |
+| E2E | Playwright vs the fixture build served by `wrangler dev` | splash → Enter → stills; lightbox open/nav/close/deep-link; film list → film page with Vimeo iframe; about renders; redirects; no console errors; CLS ≈ 0 on `/stills` |
 | Visual | Playwright `toHaveScreenshot` | splash, stills, lightbox, film, about at desktop + phone widths, reduced motion forced |
 
 - Tests use `src/content/__fixtures__/` (tiny generated images, two films,
@@ -277,3 +277,23 @@ image metadata (EXIF/date) of any kind.
 - Only if the spike fails: does the owner use the Lovable editor, and is a custom
   domain managed in Lovable? (Decides Plan B vs Plan C.)
 - Real content: hero photo, stills, film list, bio, contact links.
+
+## 10. Decisions made during implementation
+
+- **Hosting:** the spike passed (sharp/vite-imagetools builds on Lovable), so Plan A stands.
+- **E2E server:** `vite preview` can't serve the nitro `cloudflare-module` output, so
+  Playwright serves the fixture build with `wrangler dev` (devDependency). It's the same
+  workerd runtime as production.
+- **Fixture swapping:** in fixture builds (`CONTENT_FIXTURES=1`, and always in Vitest), any
+  relative import `./x` with a sibling `x.fixtures.ts` resolves to the twin. This swaps the
+  content source and the oEmbed fetch.
+- **Unlisted Vimeo links** keep their private hash (`vimeoHash`); the player (`?h=`) and
+  oEmbed need it.
+- **Route transitions** use the View Transitions API via TanStack Router; search-only
+  changes (opening a photo) don't animate.
+- **Visual baselines:** macOS baselines are committed. Linux baselines for CI are generated
+  with `scripts/update-linux-snapshots.sh` (needs Docker) and are **still to do**. Until
+  then the CI visual tests fail.
+- **Placeholder content:** Vimeo id 76979871 returns 404 from oEmbed (likely embed/privacy
+  restricted), so its tile uses the typographic fallback. `about.md` uses
+  `hello@example.com` until real details arrive.
