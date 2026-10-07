@@ -1,7 +1,7 @@
 // Build guard for src/content (spec §4.4): lists the real folders with byte sizes, runs the
 // pure validator, and fails the build with a readable message if anything is wrong.
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import type { Plugin } from "vite";
 import { parseCaptions, parseFilm } from "./parse";
 import { validateContent, type ContentListing, type ValidationResult } from "./validate";
@@ -44,7 +44,10 @@ export function checkContent(root: string): ValidationResult {
 export interface ContentPluginOptions {
   /** Folder to validate. */
   root: string;
-  /** Build the site from src/content/__fixtures__/valid instead of real content (e2e tests). */
+  /**
+   * Test builds: every relative import `./x` that has a sibling `x.fixtures.ts` resolves to
+   * that twin instead (fixture content, mocked Vimeo oEmbed).
+   */
   fixtures?: boolean;
 }
 
@@ -60,10 +63,9 @@ export function contentPlugin({ root, fixtures = false }: ContentPluginOptions):
       }
     },
     resolveId(id, importer) {
-      if (fixtures && id === "./source" && importer?.endsWith("/lib/content/index.ts")) {
-        return importer.replace(/index\.ts$/, "source.fixtures.ts");
-      }
-      return null;
+      if (!fixtures || !importer || !id.startsWith("./")) return null;
+      const twin = join(dirname(importer), `${id.slice(2)}.fixtures.ts`);
+      return existsSync(twin) ? twin : null;
     },
   };
 }

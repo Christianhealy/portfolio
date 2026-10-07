@@ -75,15 +75,22 @@ describe("contentPlugin", () => {
     expect(run(fixture("valid"))).toEqual({ error: [], warn: [], thrown: undefined });
   });
 
-  it("swaps the content source for the fixture source when fixtures are on", () => {
-    const resolve = (fixtures: boolean) =>
+  it("swaps any module that has a .fixtures.ts twin when fixtures are on", () => {
+    const lib = fileURLToPath(new URL("../", import.meta.url));
+    const resolve = (fixtures: boolean, id: string, importer: string) =>
       (
         contentPlugin({ root: fixture("valid"), fixtures }).resolveId as unknown as (
           id: string,
           importer?: string,
         ) => string | null
-      )("./source", "/repo/src/lib/content/index.ts");
-    expect(resolve(true)).toBe("/repo/src/lib/content/source.fixtures.ts");
-    expect(resolve(false)).toBeNull();
+      )(id, importer);
+    expect(resolve(true, "./source", `${lib}content/index.ts`)).toBe(
+      `${lib}content/source.fixtures.ts`,
+    );
+    expect(resolve(true, "./oembed-fetch", `${lib}vimeo-meta.ts`)).toBe(
+      `${lib}oembed-fetch.fixtures.ts`,
+    );
+    expect(resolve(true, "./parse", `${lib}content/index.ts`)).toBeNull();
+    expect(resolve(false, "./source", `${lib}content/index.ts`)).toBeNull();
   });
 });
