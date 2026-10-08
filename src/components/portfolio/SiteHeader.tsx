@@ -53,7 +53,7 @@ export function SiteHeader() {
     >
       <div
         aria-hidden="true"
-        className="site-header-blur absolute inset-0 bg-background/80 backdrop-blur-md"
+        className="site-header-backing absolute inset-0 bg-background"
         data-visible={scrolled ? "" : undefined}
       />
       <div className="relative z-10 mx-auto flex h-16 max-w-[1600px] items-center justify-between px-6 sm:h-20 sm:px-12">

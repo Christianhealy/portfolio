@@ -37,7 +37,15 @@ const stills = getStills();
 const box = (left: number, top: number, width: number, height: number) =>
   ({ left, top, width, height, right: left + width, bottom: top + height }) as DOMRect;
 
-function setup(index = 0, getOrigin?: (slug: string) => DOMRect | null) {
+/** A grid thumbnail standing at `rect`, as the stills page would hand to the lightbox. */
+function thumbnail(rect: DOMRect) {
+  const img = document.createElement("img");
+  img.getBoundingClientRect = () => rect;
+  document.body.append(img);
+  return img;
+}
+
+function setup(index = 0, getThumbnail?: (slug: string) => HTMLElement | null) {
   const onIndexChange = vi.fn();
   const onClose = vi.fn();
   const view = render(
@@ -46,7 +54,7 @@ function setup(index = 0, getOrigin?: (slug: string) => DOMRect | null) {
       index={index}
       onIndexChange={onIndexChange}
       onClose={onClose}
-      {...(getOrigin ? { getOrigin } : {})}
+      {...(getThumbnail ? { getThumbnail } : {})}
     />,
   );
   return { onIndexChange, onClose, ...view };
@@ -146,15 +154,17 @@ describe("Lightbox motion", () => {
   });
 
   it("zooms the photo out of its thumbnail on open", () => {
-    const getOrigin = vi.fn(() => box(0, 0, 100, 50));
-    setup(0, getOrigin);
-    expect(getOrigin).toHaveBeenCalledWith("dunes");
+    const thumb = thumbnail(box(0, 0, 100, 50));
+    const getThumbnail = vi.fn(() => thumb);
+    setup(0, getThumbnail);
+    expect(getThumbnail).toHaveBeenCalledWith("dunes");
     const zoom = animations.find((a) => a.target === image());
     expect(zoom?.keyframes).toMatchObject({ x: [-450, 0], y: [-275, 0], scale: [0.25, 1] });
   });
 
   it("zooms back into the thumbnail before closing", async () => {
-    const { onClose } = setup(0, () => box(0, 0, 100, 50));
+    const thumb = thumbnail(box(0, 0, 100, 50));
+    const { onClose } = setup(0, () => thumb);
     animations.length = 0;
     fireEvent.keyDown(document, { key: "Escape" });
     await vi.waitFor(() => expect(onClose).toHaveBeenCalled());
@@ -166,7 +176,8 @@ describe("Lightbox motion", () => {
   });
 
   it("fades instead of zooming when the thumbnail is off screen", () => {
-    setup(0, () => box(0, 5000, 100, 50));
+    const thumb = thumbnail(box(0, 5000, 100, 50));
+    setup(0, () => thumb);
     expect(animations.some((a) => "scale" in a.keyframes)).toBe(false);
     expect(animations.some((a) => "opacity" in a.keyframes)).toBe(true);
   });
@@ -184,7 +195,8 @@ describe("Lightbox motion", () => {
 
   it("uses only short fades under reduced motion", async () => {
     reduced = true;
-    const { onClose, rerender, onIndexChange } = setup(0, () => box(0, 0, 100, 50));
+    const thumb = thumbnail(box(0, 0, 100, 50));
+    const { onClose, rerender, onIndexChange } = setup(0, () => thumb);
     rerender(
       <Lightbox stills={stills} index={1} onIndexChange={onIndexChange} onClose={onClose} />,
     );
@@ -193,6 +205,83 @@ describe("Lightbox motion", () => {
     for (const { keyframes } of animations) {
       expect(Object.keys(keyframes).filter((k) => k !== "opacity")).toEqual([]);
     }
+  });
+});
+
+// The zoom lands exactly on the grid thumbnail; if the thumbnail were showing underneath, the
+// photo would appear to land twice. It stays hidden from the open zoom until the close zoom
+// has finished.
+describe("Lightbox source thumbnail", () => {
+  beforeEach(() => {
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue(
+      box(300, 200, 400, 200),
+    );
+  });
+
+  it("is hidden from the open zoom until the close zoom has finished", async () => {
+    hold = true;
+    const thumb = thumbnail(box(0, 0, 100, 50));
+    const { onClose } = setup(0, () => thumb);
+    expect(thumb.style.visibility).toBe("hidden");
+    release();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(thumb.style.visibility).toBe("hidden");
+
+    let visibleAtClose: string | undefined;
+    onClose.mockImplementation(() => (visibleAtClose = thumb.style.visibility));
+    fireEvent.keyDown(document, { key: "Escape" });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(thumb.style.visibility).toBe("hidden");
+    expect(onClose).not.toHaveBeenCalled();
+    release();
+    await vi.waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(visibleAtClose).toBe("");
+  });
+
+  it("swaps to the new photo's thumbnail when stepping, so close lands on the right one", async () => {
+    const first = thumbnail(box(0, 0, 100, 50));
+    const second = thumbnail(box(120, 0, 100, 50));
+    const thumbs: Record<string, HTMLElement> = { dunes: first, portrait: second };
+    const getThumbnail = (slug: string) => thumbs[slug] ?? null;
+    const { rerender, onIndexChange, onClose } = setup(0, getThumbnail);
+    rerender(
+      <Lightbox
+        stills={stills}
+        index={1}
+        onIndexChange={onIndexChange}
+        onClose={onClose}
+        getThumbnail={getThumbnail}
+      />,
+    );
+    expect(first.style.visibility).toBe("");
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(second.style.visibility).toBe("hidden");
+    await vi.waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(second.style.visibility).toBe("");
+  });
+
+  it("is shown again if the lightbox unmounts mid-zoom (e.g. browser Back)", () => {
+    hold = true;
+    const thumb = thumbnail(box(0, 0, 100, 50));
+    const { unmount } = setup(0, () => thumb);
+    unmount();
+    expect(thumb.style.visibility).toBe("");
+  });
+
+  it("stays visible when there is no zoom (off screen, or reduced motion)", async () => {
+    const offscreen = thumbnail(box(0, 5000, 100, 50));
+    const view = setup(0, () => offscreen);
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(offscreen.style.visibility).toBe("");
+    await vi.waitFor(() => expect(view.onClose).toHaveBeenCalled());
+    view.unmount();
+
+    reduced = true;
+    const thumb = thumbnail(box(0, 0, 100, 50));
+    setup(0, () => thumb);
+    expect(thumb.style.visibility).toBe("");
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(thumb.style.visibility).toBe("");
   });
 });
 

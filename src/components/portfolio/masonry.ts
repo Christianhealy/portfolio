@@ -15,9 +15,11 @@ export function distribute(heights: number[], columns: number): number[][] {
 }
 
 /** The on-screen thumbnail for a slug (only one of the per-breakpoint copies is visible). */
-export function thumbnailBox(slug: string): DOMRect | null {
-  for (const img of document.querySelectorAll(`[data-slug="${CSS.escape(slug)}"] img`)) {
-    if (img.getClientRects().length > 0) return img.getBoundingClientRect();
+export function thumbnailFor(slug: string): HTMLElement | null {
+  for (const img of document.querySelectorAll<HTMLElement>(
+    `[data-slug="${CSS.escape(slug)}"] img`,
+  )) {
+    if (img.getClientRects().length > 0) return img;
   }
   return null;
 }

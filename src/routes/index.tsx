@@ -1,6 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Fragment } from "react";
-import { Parallax } from "@/components/motion/Parallax";
 import { Picture } from "@/components/portfolio/Picture";
 import { getHero } from "@/lib/content";
 
@@ -39,33 +37,20 @@ function Splash() {
   const hero = getHero();
   return (
     <main className="relative h-svh w-full overflow-hidden bg-foreground text-background">
-      <Parallax className="absolute inset-0">
-        <Picture
-          image={hero}
-          alt=""
-          sizes="100vw"
-          loading="eager"
-          fetchPriority="high"
-          pictureClassName="splash-hero block size-full"
-          className="size-full object-cover"
-        />
-      </Parallax>
-      <div aria-hidden="true" className="absolute inset-0 bg-black/25" />
-      <div className="relative flex h-full flex-col items-center justify-center gap-10 px-6 text-center">
-        <h1 className="font-display text-6xl leading-none sm:text-8xl lg:text-9xl">
-          {["Christian", "Healy"].map((word, i) => (
-            <Fragment key={word}>
-              {i > 0 && " "}
-              <span className="splash-line">
-                <span style={{ animationDelay: `${0.35 + i * 0.12}s` }}>{word}</span>
-              </span>
-            </Fragment>
-          ))}
-        </h1>
-        <Link
-          to="/stills"
-          className="splash-enter border-b border-current pb-1 text-[11px] uppercase tracking-[0.22em] transition-opacity hover:opacity-70"
-        >
+      <h1 className="sr-only">Christian Healy</h1>
+      <Picture
+        image={hero}
+        alt=""
+        sizes="100vw"
+        loading="eager"
+        fetchPriority="high"
+        pictureClassName="splash-hero absolute inset-0 block"
+        className="size-full object-cover"
+      />
+      {/* A soft pool of shade behind Enter, so it reads on any photo without dimming it all. */}
+      <div aria-hidden="true" className="splash-shade absolute inset-0" />
+      <div className="relative grid h-full place-items-center">
+        <Link to="/stills" className="splash-enter">
           Enter
         </Link>
       </div>

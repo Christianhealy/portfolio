@@ -12,8 +12,8 @@ interface Props {
   index: number;
   onIndexChange: (index: number) => void;
   onClose: () => void;
-  /** The visible thumbnail's box for a slug, so open/close can zoom from/to it. */
-  getOrigin?: (slug: string) => DOMRect | null;
+  /** The visible grid thumbnail for a slug, so open/close can zoom from/to it. */
+  getThumbnail?: (slug: string) => HTMLElement | null;
 }
 
 const SWIPE_MIN = 50;
@@ -22,7 +22,7 @@ const pad = (n: number) => String(n).padStart(2, "0");
 const FOCUSABLE = "button, [href], [tabindex]:not([tabindex='-1'])";
 const zoom = { duration: DURATION.lightbox, ease: EASE };
 
-export function Lightbox({ stills, index, onIndexChange, onClose, getOrigin }: Props) {
+export function Lightbox({ stills, index, onIndexChange, onClose, getThumbnail }: Props) {
   const { reduced } = useMotionPrefs();
   const dialog = useRef<HTMLDivElement>(null);
   const backdrop = useRef<HTMLDivElement>(null);
@@ -30,17 +30,27 @@ export function Lightbox({ stills, index, onIndexChange, onClose, getOrigin }: P
   const touch = useRef<{ x: number; y: number } | null>(null);
   const shownIndex = useRef<number | null>(null);
   const closing = useRef(false);
+  // The thumbnail the zoom lands on is hidden while zooming, or the photo would appear twice.
+  const hiddenThumb = useRef<HTMLElement | null>(null);
+  const hideThumb = (el: HTMLElement | null) => {
+    if (hiddenThumb.current) hiddenThumb.current.style.visibility = "";
+    hiddenThumb.current = el;
+    if (el) el.style.visibility = "hidden";
+  };
   // Back can unmount us mid-exit-animation; a late onClose would then navigate twice.
   const unmounted = useRef(false);
   const count = stills.length;
   const still = stills[index];
   const step = (delta: number) => onIndexChange((index + delta + count) % count);
 
-  /** The thumbnail's box if it's visible, for the shared-layout zoom. */
+  /** The thumbnail and its box if it's on screen, for the shared-layout zoom. */
   const origin = () => {
-    if (reduced || !still || !getOrigin) return null;
-    const box = getOrigin(still.slug);
-    return box && isOnScreen(box, window.innerWidth, window.innerHeight) ? box : null;
+    if (reduced || !still || !getThumbnail) return null;
+    const thumb = getThumbnail(still.slug);
+    const box = thumb?.getBoundingClientRect();
+    return thumb && box && isOnScreen(box, window.innerWidth, window.innerHeight)
+      ? { thumb, box }
+      : null;
   };
 
   const close = () => {
@@ -48,10 +58,12 @@ export function Lightbox({ stills, index, onIndexChange, onClose, getOrigin }: P
     closing.current = true;
     const from = origin();
     const fade = { duration: reduced ? DURATION.reduced : DURATION.chrome };
+    const zooming = from && image.current && backdrop.current;
+    hideThumb(zooming ? from.thumb : null);
     const done =
-      from && image.current && backdrop.current
+      zooming && image.current && backdrop.current
         ? Promise.all([
-            animate(image.current, flipFrom(from, image.current.getBoundingClientRect()), zoom)
+            animate(image.current, flipFrom(from.box, image.current.getBoundingClientRect()), zoom)
               .finished,
             animate(backdrop.current, { opacity: 0 }, fade).finished,
             ...[...(dialog.current?.querySelectorAll("[data-lightbox-ui]") ?? [])].map(
@@ -60,7 +72,10 @@ export function Lightbox({ stills, index, onIndexChange, onClose, getOrigin }: P
           ])
         : animate(dialog.current!, { opacity: 0 }, fade).finished;
     void done.then(() => {
-      if (!unmounted.current) onClose();
+      if (unmounted.current) return;
+      // The photo now sits exactly over its thumbnail: swap them, then go.
+      hideThumb(null);
+      onClose();
     });
   };
 
@@ -77,7 +92,8 @@ export function Lightbox({ stills, index, onIndexChange, onClose, getOrigin }: P
     if (previous === null) {
       const from = origin();
       if (from && backdrop.current) {
-        const { x, y, scale } = flipFrom(from, img.getBoundingClientRect());
+        hideThumb(from.thumb);
+        const { x, y, scale } = flipFrom(from.box, img.getBoundingClientRect());
         animate(img, { x: [x, 0], y: [y, 0], scale: [scale, 1] }, zoom);
         animate(backdrop.current, { opacity: [0, 1] }, { duration: DURATION.chrome });
       } else {
@@ -85,6 +101,7 @@ export function Lightbox({ stills, index, onIndexChange, onClose, getOrigin }: P
         animate(dialog.current, { opacity: [0, 1] }, { duration });
       }
     } else if (previous !== index) {
+      hideThumb(null);
       if (reduced) {
         animate(img, { opacity: [0, 1] }, { duration: DURATION.reduced });
       } else {
@@ -119,6 +136,7 @@ export function Lightbox({ stills, index, onIndexChange, onClose, getOrigin }: P
     document.addEventListener("keydown", onKey);
     return () => {
       unmounted.current = true;
+      hideThumb(null);
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = overflow;
       previouslyFocused?.focus?.({ preventScroll: true });
@@ -188,8 +206,14 @@ export function Lightbox({ stills, index, onIndexChange, onClose, getOrigin }: P
           image={still.image}
           alt={alt}
           sizes="100vw"
-          pictureClassName="absolute inset-x-4 inset-y-0 sm:inset-x-20"
-          className="absolute inset-0 m-auto h-auto max-h-full w-auto max-w-full"
+          pictureClassName="absolute inset-x-4 inset-y-0 [container-type:size] sm:inset-x-20"
+          className="absolute inset-0 m-auto h-auto"
+          // Fit the stage from the intrinsic size, not the loaded file: an image that hasn't
+          // loaded yet has no size, and the open zoom would measure a 0×0 target.
+          style={{
+            aspectRatio: `${still.image.width} / ${still.image.height}`,
+            width: `min(100cqw, 100cqh * ${still.image.width / still.image.height})`,
+          }}
           data-lightbox-image=""
         />
         <button

@@ -39,24 +39,18 @@ export function FilmMedia({ image, title, loop, sizes = "(min-width: 768px) 50vw
 
   return (
     <div className="relative w-full overflow-hidden bg-card" style={{ aspectRatio: ratio }}>
-      {image.kind === "poster" && (
+      {image.kind !== "card" && (
         <Picture
-          image={image.image}
+          image={
+            image.kind === "poster"
+              ? image.image
+              : { src: image.src, width: image.width, height: image.height, sources: [] }
+          }
           alt=""
           sizes={sizes}
           loading="lazy"
-          className="size-full object-cover"
-        />
-      )}
-      {image.kind === "thumbnail" && (
-        <img
-          src={image.src}
-          width={image.width}
-          height={image.height}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          className="size-full object-cover"
+          fadeIn
+          className="fade-in-image size-full object-cover"
         />
       )}
       {image.kind === "card" && (

@@ -4,9 +4,21 @@
 import { expect, test } from "./test";
 
 test.describe("splash", () => {
-  test("shows the name without site chrome and enters the stills page", async ({ page }) => {
+  test("is just the photo and Enter, without site chrome, and enters the stills page", async ({
+    page,
+  }) => {
     await page.goto("/");
-    await expect(page.getByRole("heading", { name: "Christian Healy" })).toBeVisible();
+    // The name is there for screen readers and search engines, but not drawn on the photo.
+    const heading = page.getByRole("heading", { name: "Christian Healy", level: 1 });
+    await expect(heading).toHaveCount(1);
+    await expect(heading).toHaveClass(/\bsr-only\b/);
+    const enter = page.getByRole("link", { name: "Enter" });
+    await expect(enter).toBeVisible();
+    // Enter sits in the middle of the screen.
+    const box = (await enter.boundingBox())!;
+    const viewport = page.viewportSize()!;
+    expect(Math.abs(box.x + box.width / 2 - viewport.width / 2)).toBeLessThan(2);
+    expect(Math.abs(box.y + box.height / 2 - viewport.height / 2)).toBeLessThan(2);
     await expect(page.getByRole("navigation")).toHaveCount(0);
     await expect(page.getByRole("contentinfo")).toHaveCount(0);
     await page.getByRole("link", { name: "Enter" }).click();
@@ -187,6 +199,40 @@ test.describe("full motion", () => {
     await page.keyboard.press("Escape");
     await expect(dialog).toBeHidden();
     await expect(page).toHaveURL(/\/stills$/);
+  });
+
+  // The zoom measures the full-size photo's box on open. On a cold cache that photo hasn't
+  // loaded yet, so its box must already be its final, fitted size — or the zoom has nothing
+  // to grow into and only slides.
+  test("the very first open zooms out of the thumbnail, before the photo has loaded", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, "phone thumbnails are already full width: the lightbox reuses that file");
+    await page.goto("/stills");
+    await page.waitForLoadState("networkidle");
+    // Hold back every image fetched from now on (the lightbox's large version).
+    let releaseImages!: () => void;
+    const held = new Promise<void>((resolve) => (releaseImages = resolve));
+    await page.route(/\.(avif|webp|jpe?g|png)(\?|$)/, async (route) => {
+      await held;
+      await route.continue();
+    });
+    await page.getByRole("button", { name: "Open dunes" }).click();
+    const image = page.locator("[data-lightbox-image]");
+    const box = () =>
+      image.evaluate((img: HTMLImageElement) => ({
+        complete: img.complete && img.naturalWidth > 0,
+        width: img.offsetWidth,
+        height: img.offsetHeight,
+      }));
+    const unloaded = await box();
+    expect(unloaded.complete).toBe(false);
+    releaseImages();
+    await expect.poll(async () => (await box()).complete).toBe(true);
+    const loaded = await box();
+    expect(unloaded.width).toBeGreaterThan(0);
+    expect(unloaded).toMatchObject({ width: loaded.width, height: loaded.height });
   });
 
   test("splash enters the site and pages transition", async ({ page }) => {

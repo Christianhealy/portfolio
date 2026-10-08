@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { FilmImage } from "@/lib/vimeo";
 import { FilmMedia } from "./FilmMedia";
@@ -51,6 +51,19 @@ const intersect = (isIntersecting: boolean) =>
   );
 
 describe("FilmMedia", () => {
+  it.each([
+    ["poster", poster],
+    ["Vimeo thumbnail", thumbnail],
+  ])("fades the %s in from the placeholder once loaded, like the stills", (_, image) => {
+    vi.spyOn(HTMLImageElement.prototype, "complete", "get").mockReturnValue(false);
+    const { container } = render(<FilmMedia image={image} title="Spring" />);
+    const img = container.querySelector("img")!;
+    expect(img).toHaveClass("fade-in-image");
+    expect(img).toHaveAttribute("data-loading");
+    fireEvent.load(img);
+    expect(img).not.toHaveAttribute("data-loading");
+  });
+
   it("shows the local poster", () => {
     const { container } = render(<FilmMedia image={poster} title="Spring" />);
     expect(container.querySelector("img")).toHaveAttribute("src", "/poster.jpg");

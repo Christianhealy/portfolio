@@ -172,7 +172,7 @@ no audio, < 8 MB, exported from the master (not a Vimeo download). HandBrake
 
 | Route | Content |
 |---|---|
-| `/` | Splash: full-bleed hero image, name in large Instrument Serif, small "Enter" link → `/stills`. Always shown when visiting `/`. |
+| `/` | Splash: full-bleed hero image and a centred, hairline-framed "Enter" link → `/stills` (the name is a visually hidden `<h1>`; see §10). Always shown when visiting `/`. |
 | `/stills` | Uncropped masonry (3 cols desktop / 2 tablet / 1–2 phone). Click opens lightbox; URL `?photo=<slug>`. |
 | `/film` | 2-column grid of `FilmTile`s (poster/oEmbed thumb, upgraded to loop if present), caption: client + "Title". |
 | `/film/$slug` | 16:9 Vimeo player, Info (client, title, year, description), Credits, prev/next film. 404 for unknown slug. |
@@ -212,8 +212,8 @@ it.
 - Shared tokens: easing `cubic-bezier(0.16, 1, 0.3, 1)`; durations 400–900 ms.
 - **Global:** Lenis on desktop fine-pointer devices only; native scroll on touch,
   inside the lightbox, and over Vimeo iframes.
-- **Splash:** hero scales 1.06 → 1.0 on load; name reveals line-by-line (masked
-  slide-up); "Enter" fades in last. On exit: slight zoom + crossfade.
+- **Splash:** hero scales 1.06 → 1.0 on load; "Enter" fades in after it. On exit: slight
+  zoom + crossfade.
 - **Route changes:** ~400 ms crossfade; scroll to top on navigation; native
   restoration on back/forward.
 - **Masonry:** tiles fade + rise ~24 px on first entry, staggered ~60 ms by
@@ -294,6 +294,18 @@ image metadata (EXIF/date) of any kind.
 - **Visual baselines:** macOS baselines are committed. Linux baselines for CI are generated
   with `scripts/update-linux-snapshots.sh` (needs Docker) and are **still to do**. Until
   then the CI visual tests fail.
+- **Splash without the name (design polish round):** the large serif name was removed at the
+  owner's request so only the photograph and "Enter" remain. "Enter" sits dead centre in a
+  hairline frame that fills white on hover, over a soft radial shade so it reads on any photo.
+  The name stays as a visually hidden `<h1>` for screen readers and search engines.
+- **Lightbox thumbnail during the zoom:** the grid thumbnail the photo zooms from/to is hidden
+  from the open zoom until the close zoom has finished, so the photo never appears to land
+  twice. With no zoom (thumbnail off screen, reduced motion) it is never hidden.
+- **Lightbox sizing:** the full-size photo is sized from its intrinsic dimensions (container
+  query units on the stage), not from the loaded file. Before, an image that hadn't loaded yet
+  measured 0×0, so the first open on a cold cache slid without zooming.
+- **Film tiles fade in** from the placeholder once loaded, like the stills (poster and Vimeo
+  thumbnail alike).
 - **Placeholder content:** Vimeo id 76979871 returns 404 from oEmbed (likely embed/privacy
   restricted), so its tile uses the typographic fallback. `about.md` uses
   `hello@example.com` until real details arrive.

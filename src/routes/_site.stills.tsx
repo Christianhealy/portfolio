@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useRef } from "react";
 import { Lightbox } from "@/components/portfolio/Lightbox";
 import { MasonryGrid } from "@/components/portfolio/MasonryGrid";
-import { thumbnailBox } from "@/components/portfolio/masonry";
+import { thumbnailFor } from "@/components/portfolio/masonry";
 import { getStills } from "@/lib/content";
 
 const title = "Stills — Christian Healy";
@@ -59,7 +59,7 @@ function StillsPage() {
           index={index}
           onIndexChange={(i) => show(i, true)}
           onClose={close}
-          getOrigin={thumbnailBox}
+          getThumbnail={thumbnailFor}
         />
       )}
     </main>
