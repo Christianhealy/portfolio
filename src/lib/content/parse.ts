@@ -38,7 +38,8 @@ export function parseFrontMatter(text: string): { data: Record<string, string>; 
     const key = line.slice(0, colon).trim();
     const value = line
       .slice(colon + 1)
-      .replace(/\s+#.*$/, "")
+      // A comment is " # " (hash then a space or line end), so "Episode #2" survives.
+      .replace(/\s+#(\s.*)?$/, "")
       .trim();
     if (key && value) data[key] = value;
   }
@@ -46,11 +47,13 @@ export function parseFrontMatter(text: string): { data: Record<string, string>; 
 }
 
 const CREDIT_LINE = /^([^:\n]{1,40}):\s+(\S.*)$/;
+// "Commissioned by Nike: a spring campaign." is prose: credit names don't end a sentence.
+const isCredit = (line: string) => CREDIT_LINE.test(line) && !/[.!?]\s*$/.test(line);
 
 function splitCredits(body: string): { description: string; credits: Credit[] } {
   const lines = body.split(/\r?\n/);
   let start = lines.length;
-  while (start > 0 && CREDIT_LINE.test(lines[start - 1] ?? "")) start--;
+  while (start > 0 && isCredit(lines[start - 1] ?? "")) start--;
   // Credits must be their own block: preceded by a blank line or the start of the body.
   if (start > 0 && (lines[start - 1] ?? "").trim() !== "") start = lines.length;
   const credits = lines.slice(start).map((line) => {

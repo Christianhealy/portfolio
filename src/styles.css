@@ -326,3 +326,10 @@ html.lenis body {
     animation: fade-out 200ms linear both;
   }
 }
+
+/* Keyboard users tabbing into a header that slid away must be able to see it. */
+.site-header:focus-within {
+  transform: none;
+  opacity: 1;
+  pointer-events: auto;
+}

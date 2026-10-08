@@ -207,3 +207,36 @@ test.describe("full motion", () => {
     ).toBeVisible();
   });
 });
+
+test.describe("header keyboard access", () => {
+  test("a header that slid away comes back when it receives focus", async ({ page, isMobile }) => {
+    test.skip(isMobile, "the phone header has no inline links");
+    await page.goto("/stills");
+    await page.evaluate(() => window.scrollTo(0, 600));
+    const header = page.locator("header");
+    await expect(header).toHaveAttribute("data-hidden", "");
+    await header.getByRole("link", { name: "Film" }).focus();
+    await expect(header).toHaveCSS("opacity", "1");
+    await expect(header).toHaveCSS("transform", "none");
+  });
+
+  test("the mobile menu takes focus, keeps Tab inside, and returns focus on Escape", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(!isMobile, "phone-only menu");
+    await page.goto("/stills");
+    const toggle = page.getByRole("button", { name: "Open menu" });
+    await toggle.click();
+    const menu = page.getByRole("navigation", { name: "Primary" });
+    await expect(menu.getByRole("link", { name: "Stills" })).toBeFocused();
+    for (let i = 0; i < 6; i++) {
+      await page.keyboard.press("Tab");
+      const inside = await page.evaluate(() => !!document.activeElement?.closest("header"));
+      expect(inside).toBe(true);
+    }
+    await page.keyboard.press("Escape");
+    await expect(menu).toBeHidden();
+    await expect(page.getByRole("button", { name: "Open menu" })).toBeFocused();
+  });
+});

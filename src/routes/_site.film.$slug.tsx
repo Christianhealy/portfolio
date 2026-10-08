@@ -1,7 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { Reveal } from "@/components/motion/Reveal";
 import { getFilm, getFilms } from "@/lib/content";
 import { getVimeoMeta } from "@/lib/vimeo-meta";
-import { filmRefs, filmTitle, vimeoPlayerUrl } from "@/lib/vimeo";
+import { filmTitle, vimeoPlayerUrl } from "@/lib/vimeo";
 
 const label = "text-[10px] uppercase tracking-[0.2em] text-muted-foreground";
 
@@ -9,7 +10,7 @@ export const Route = createFileRoute("/_site/film/$slug")({
   loader: async ({ params }) => {
     if (!getFilm(params.slug)) throw notFound();
     // Neighbours' titles may come from Vimeo too; lookups are cached server-side.
-    return getVimeoMeta({ data: filmRefs(getFilms()) });
+    return getVimeoMeta();
   },
   staleTime: 10 * 60 * 1000,
   head: ({ params, loaderData }) => {
@@ -56,7 +57,13 @@ function FilmDetail() {
       <div className="mt-12 grid gap-12 md:grid-cols-[2fr_1fr]">
         <section>
           <p className={label}>{[film.client, film.year].filter(Boolean).join(" · ") || "Film"}</p>
-          <h1 className="mt-4 font-display text-5xl leading-tight sm:text-6xl">{title}</h1>
+          <Reveal
+            as="h1"
+            variant="mask"
+            className="mt-4 font-display text-5xl leading-tight sm:text-6xl"
+          >
+            {title}
+          </Reveal>
           {film.description && (
             <div className="mt-8 max-w-2xl space-y-4 text-sm leading-7 text-muted-foreground">
               {film.description.split(/\n\s*\n/).map((paragraph, i) => (
@@ -67,7 +74,9 @@ function FilmDetail() {
         </section>
         {film.credits.length > 0 && (
           <section>
-            <h2 className={label}>Credits</h2>
+            <Reveal as="h2" variant="mask" className={label}>
+              Credits
+            </Reveal>
             <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-sm">
               {film.credits.map((credit, i) => (
                 <div key={i} className="contents">

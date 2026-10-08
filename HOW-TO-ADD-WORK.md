@@ -26,7 +26,10 @@ short name in lower case:
   `015-new-photo.jpg` lands between 010 and 020. No need to rename anything else.
 - The part after the number becomes the web address: `020-lisbon-portrait.jpg` →
   `/stills?photo=lisbon-portrait`, and `010-nike-spring.md` → `/film/nike-spring`. So keep it
-  short, lower case, with dashes instead of spaces.
+  short, lower case, with dashes instead of spaces, using plain letters a–z and numbers
+  (`010-東京.jpg` is refused because it leaves nothing for the web address).
+- Keep the ending consistent: `.jpg` or `.JPG` both work, `.Jpg` doesn't (the site will tell
+  you).
 - Two files can't share the same name after the number (e.g. `010-desert.jpg` and
   `020-desert.jpg`); the site will refuse to build and tell you which ones clash.
 - Files without a number are shown after all the numbered ones, alphabetically.

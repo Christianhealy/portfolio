@@ -105,3 +105,23 @@ describe("validateContent", () => {
     expect(result.warnings).toEqual([expect.stringMatching(/999-gone\.jpg/)]);
   });
 });
+
+describe("validateContent filename edge cases", () => {
+  it("rejects mixed-case extensions (the site only loads .jpg or .JPG, not .Jpg)", () => {
+    const result = validateContent(withFolder("hero", [{ name: "h.Jpg", size: 1 }]));
+    expect(result.errors).toEqual(
+      expect.arrayContaining([expect.stringMatching(/hero\/h\.Jpg.*\.jpg/)]),
+    );
+  });
+
+  it("accepts all-upper-case extensions straight from a camera", () => {
+    expect(
+      validateContent(withFolder("stills", [{ name: "IMG_0001.JPG", size: 1 }])).errors,
+    ).toEqual([]);
+  });
+
+  it("rejects names that leave nothing usable for the web address", () => {
+    const result = validateContent(withFolder("stills", [{ name: "010-東京.jpg", size: 1 }]));
+    expect(result.errors).toEqual([expect.stringMatching(/stills\/010-東京\.jpg.*letters/)]);
+  });
+});

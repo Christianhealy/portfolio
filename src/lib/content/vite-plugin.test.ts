@@ -1,4 +1,7 @@
 // @vitest-environment node
+import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { checkContent, contentPlugin, listContent } from "./vite-plugin";
@@ -92,5 +95,16 @@ describe("contentPlugin", () => {
     );
     expect(resolve(true, "./parse", `${lib}content/index.ts`)).toBeNull();
     expect(resolve(false, "./source", `${lib}content/index.ts`)).toBeNull();
+  });
+});
+
+describe("checkContent with upper-case film files", () => {
+  it("checks .MD film files too", () => {
+    const root = mkdtempSync(join(tmpdir(), "content-"));
+    mkdirSync(join(root, "film"));
+    writeFileSync(join(root, "film", "010-x.MD"), "---\ntitle: no link\n---\n");
+    expect(checkContent(root).errors).toEqual(
+      expect.arrayContaining([expect.stringMatching(/010-x\.MD.*vimeo/i)]),
+    );
   });
 });

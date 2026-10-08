@@ -56,7 +56,13 @@ export function createOEmbedClient(fetchFn: Fetch, { now = Date.now } = {}) {
     const video = `https://vimeo.com/${id}${hash ? `/${hash}` : ""}`;
     const url = `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(video)}&width=1280`;
     try {
-      const response = await fetchFn(url, { signal: AbortSignal.timeout(4000) });
+      // `cf` is Cloudflare-only: it caches the response at the edge across all Worker
+      // instances (ignored elsewhere). The in-memory cache below covers a single instance.
+      const init = {
+        signal: AbortSignal.timeout(4000),
+        cf: { cacheTtl: SUCCESS_TTL / 1000, cacheEverything: true },
+      };
+      const response = await fetchFn(url, init as RequestInit);
       if (!response.ok) return null;
       const data = (await response.json()) as Record<string, unknown>;
       const meta: VimeoMeta = {};
@@ -104,4 +110,15 @@ export function filmImage(film: FilmEntry, meta: VimeoMeta | null): FilmImage {
 
 export function filmRefs(films: FilmEntry[]): VimeoRef[] {
   return films.map((f) => (f.vimeoHash ? { id: f.vimeoId, hash: f.vimeoHash } : { id: f.vimeoId }));
+}
+
+/** oEmbed metadata for the given films, keyed by Vimeo id (null when unavailable). */
+export async function lookupFilmMeta(
+  client: { get: (id: string, hash?: string) => Promise<VimeoMeta | null> },
+  films: FilmEntry[],
+): Promise<Record<string, VimeoMeta | null>> {
+  const entries = await Promise.all(
+    filmRefs(films).map(async ({ id, hash }) => [id, await client.get(id, hash)] as const),
+  );
+  return Object.fromEntries(entries);
 }

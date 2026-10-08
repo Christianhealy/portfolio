@@ -4,6 +4,7 @@ import {
   createOEmbedClient,
   filmImage,
   filmRefs,
+  lookupFilmMeta,
   filmTitle,
   parseVimeo,
   parseVimeoId,
@@ -77,6 +78,14 @@ describe("createOEmbedClient", () => {
     expect(fetch.mock.calls[0]![0]).toContain("url=https%3A%2F%2Fvimeo.com%2F5%2Fab12&");
   });
 
+  it("asks Cloudflare's edge cache to keep oEmbed responses for 6 hours", async () => {
+    const fetch = vi.fn(async (_url: string, _init?: RequestInit) => ok(oembed));
+    await createOEmbedClient(fetch).get("1");
+    expect(fetch.mock.calls[0]![1]).toMatchObject({
+      cf: { cacheTtl: 21600, cacheEverything: true },
+    });
+  });
+
   it("caches results per id", async () => {
     const fetch = vi.fn(async () => ok(oembed));
     const client = createOEmbedClient(fetch);
@@ -141,5 +150,20 @@ describe("filmRefs", () => {
       { id: "1" },
       { id: "2", hash: "ab" },
     ]);
+  });
+});
+
+describe("lookupFilmMeta", () => {
+  it("looks up exactly the given films (with hashes), keyed by Vimeo id", async () => {
+    const get = vi.fn(async (id: string) => (id === "1" ? { title: "One" } : null));
+    const result = await lookupFilmMeta({ get }, [
+      film({ vimeoId: "1" }),
+      film({ vimeoId: "2", vimeoHash: "ab" }),
+    ]);
+    expect(get.mock.calls).toEqual([
+      ["1", undefined],
+      ["2", "ab"],
+    ]);
+    expect(result).toEqual({ "1": { title: "One" }, "2": null });
   });
 });

@@ -30,6 +30,8 @@ export function Lightbox({ stills, index, onIndexChange, onClose, getOrigin }: P
   const touch = useRef<{ x: number; y: number } | null>(null);
   const shownIndex = useRef<number | null>(null);
   const closing = useRef(false);
+  // Back can unmount us mid-exit-animation; a late onClose would then navigate twice.
+  const unmounted = useRef(false);
   const count = stills.length;
   const still = stills[index];
   const step = (delta: number) => onIndexChange((index + delta + count) % count);
@@ -57,7 +59,9 @@ export function Lightbox({ stills, index, onIndexChange, onClose, getOrigin }: P
             ),
           ])
         : animate(dialog.current!, { opacity: 0 }, fade).finished;
-    void done.then(() => onClose());
+    void done.then(() => {
+      if (!unmounted.current) onClose();
+    });
   };
 
   // Keep the latest handlers without re-binding listeners on every render.
@@ -94,6 +98,7 @@ export function Lightbox({ stills, index, onIndexChange, onClose, getOrigin }: P
   }, [index]);
 
   useEffect(() => {
+    unmounted.current = false;
     const previouslyFocused = document.activeElement as HTMLElement | null;
     dialog.current?.querySelector<HTMLElement>(FOCUSABLE)?.focus();
     const overflow = document.body.style.overflow;
@@ -113,6 +118,7 @@ export function Lightbox({ stills, index, onIndexChange, onClose, getOrigin }: P
     };
     document.addEventListener("keydown", onKey);
     return () => {
+      unmounted.current = true;
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = overflow;
       previouslyFocused?.focus?.({ preventScroll: true });

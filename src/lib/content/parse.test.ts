@@ -97,3 +97,33 @@ describe("parseFilm unlisted videos", () => {
     expect(film).toMatchObject({ vimeoId: "123", vimeoHash: "abc99" });
   });
 });
+
+describe("front-matter comments", () => {
+  it("keeps a # that is part of the value", () => {
+    const { data } = parseFrontMatter("---\ntitle: Episode #2\nclient: Studio #9\n---\n");
+    expect(data).toEqual({ title: "Episode #2", client: "Studio #9" });
+  });
+
+  it("still strips a real trailing comment", () => {
+    expect(parseFrontMatter("---\nemail: a@b.co   # replace me\n---\n").data["email"]).toBe(
+      "a@b.co",
+    );
+  });
+});
+
+describe("credits vs prose", () => {
+  it("treats a sentence containing a colon as description, not a credit", () => {
+    const film = parseFilm(
+      "a.md",
+      "---\nvimeo: 1\n---\nCommissioned by Nike: a spring campaign.\n",
+    );
+    expect(film.description).toBe("Commissioned by Nike: a spring campaign.");
+    expect(film.credits).toEqual([]);
+  });
+
+  it("still accepts a body that is only credits", () => {
+    const film = parseFilm("a.md", "---\nvimeo: 1\n---\nDirector: Christian Healy\nDP: Jane Doe\n");
+    expect(film.description).toBe("");
+    expect(film.credits).toHaveLength(2);
+  });
+});

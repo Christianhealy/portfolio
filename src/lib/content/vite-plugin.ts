@@ -31,7 +31,7 @@ export function checkContent(root: string): ValidationResult {
   const listing = listContent(root);
   const result = validateContent(listing);
   for (const file of listing.film) {
-    if (!file.name.endsWith(".md")) continue;
+    if (!/\.md$/i.test(file.name)) continue;
     try {
       parseFilm(file.name, readFileSync(join(root, "film", file.name), "utf8"));
     } catch (error) {

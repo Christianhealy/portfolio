@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useScrollChrome } from "./useScrollChrome";
 
 const links = [
@@ -14,22 +14,40 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const { hidden, scrolled } = useScrollChrome();
 
+  const header = useRef<HTMLElement>(null);
+  const toggle = useRef<HTMLButtonElement>(null);
+
+  // Full-screen menu: focus its first link, keep Tab inside the header, Escape returns focus.
   useEffect(() => {
     if (!open) return;
-    const close = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
+    const visible = () =>
+      [...(header.current?.querySelectorAll<HTMLElement>("a, button") ?? [])].filter(
+        (el) => el.getClientRects().length > 0,
+      );
+    header.current?.querySelector<HTMLElement>("nav[data-menu] a")?.focus();
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+        toggle.current?.focus();
+      } else if (event.key === "Tab") {
+        const items = visible();
+        const position = items.indexOf(document.activeElement as HTMLElement);
+        event.preventDefault();
+        items[(position + (event.shiftKey ? -1 : 1) + items.length) % items.length]?.focus();
+      }
     };
-    document.addEventListener("keydown", close);
+    document.addEventListener("keydown", onKey);
     const overflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
-      document.removeEventListener("keydown", close);
+      document.removeEventListener("keydown", onKey);
       document.body.style.overflow = overflow;
     };
   }, [open]);
 
   return (
     <header
+      ref={header}
       data-hidden={hidden && !open ? "" : undefined}
       className="site-header fixed inset-x-0 top-0 z-40"
     >
@@ -62,6 +80,7 @@ export function SiteHeader() {
         </nav>
 
         <button
+          ref={toggle}
           type="button"
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
@@ -75,6 +94,7 @@ export function SiteHeader() {
       {open && (
         <nav
           aria-label="Primary"
+          data-menu=""
           data-lenis-prevent=""
           className="fixed inset-0 flex flex-col justify-center gap-6 bg-background px-6 sm:hidden"
         >

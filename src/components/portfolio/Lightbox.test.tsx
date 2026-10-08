@@ -9,17 +9,26 @@ vi.mock("@/components/motion/useMotionPrefs", () => ({
   useMotionPrefs: () => ({ reduced, smoothScroll: false }),
 }));
 
-// Record animations instead of running them; each resolves immediately.
+// Record animations instead of running them; each resolves immediately unless `hold` is set,
+// in which case they finish only when `release()` is called.
 const animations: { target: Element; keyframes: Record<string, unknown> }[] = [];
+let hold = false;
+const pending: (() => void)[] = [];
+const release = () => pending.splice(0).forEach((resolve) => resolve());
 vi.mock("motion", () => ({
   animate: (target: Element, keyframes: Record<string, unknown>) => {
     animations.push({ target, keyframes });
-    return { finished: Promise.resolve(), stop: () => {}, then: (r: () => void) => r() };
+    const finished = hold
+      ? new Promise<void>((resolve) => pending.push(resolve))
+      : Promise.resolve();
+    return { finished, stop: () => {} };
   },
 }));
 
 beforeEach(() => {
   reduced = false;
+  hold = false;
+  pending.length = 0;
   animations.length = 0;
 });
 
@@ -184,5 +193,17 @@ describe("Lightbox motion", () => {
     for (const { keyframes } of animations) {
       expect(Object.keys(keyframes).filter((k) => k !== "opacity")).toEqual([]);
     }
+  });
+});
+
+describe("Lightbox closing race", () => {
+  it("does not call onClose if it was unmounted (e.g. by browser Back) mid-exit", async () => {
+    hold = true;
+    const { onClose, unmount } = setup();
+    fireEvent.keyDown(document, { key: "Escape" });
+    unmount();
+    release();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(onClose).not.toHaveBeenCalled();
   });
 });

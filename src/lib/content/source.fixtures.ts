@@ -24,7 +24,7 @@ const source: ContentSource = {
     import: "default",
     query: "?raw",
   }),
-  films: import.meta.glob<string>("/src/content/__fixtures__/valid/film/*.md", {
+  films: import.meta.glob<string>("/src/content/__fixtures__/valid/film/*.{md,MD}", {
     eager: true,
     import: "default",
     query: "?raw",

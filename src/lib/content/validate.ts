@@ -51,9 +51,19 @@ export function validateContent(listing: ContentListing): ValidationResult {
       if (file.name.startsWith(".")) continue;
       const path = `${folder}/${file.name}`;
       const e = ext(file.name);
+      const raw = file.name.split(".").pop() ?? "";
+      const slugged =
+        (folder === "stills" && isImage(file.name)) || (folder === "film" && e === "md");
       if (!ALLOWED[folder].includes(e)) {
         errors.push(
           `${path}: .${e} files aren't supported here (use ${ALLOWED[folder].join(", ")}).`,
+        );
+      } else if (raw !== e && raw !== e.toUpperCase()) {
+        // The content globs match .jpg or .JPG, never .Jpg.
+        errors.push(`${path}: rename the ending to .${e} (mixed-case .${raw} isn't loaded).`);
+      } else if (slugged && slugFromFilename(file.name) === "") {
+        errors.push(
+          `${path}: the name needs some plain letters or numbers (a–z, 0–9) for its web address.`,
         );
       } else if (isImage(file.name)) {
         if (file.size > LIMITS.imageError) {
