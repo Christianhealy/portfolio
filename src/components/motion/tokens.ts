@@ -16,3 +16,5 @@ export const REVEAL_RISE = 24;
 export const REVEAL_STAGGER = 0.06;
 /** Parallax travel as a fraction of the element's height (±). */
 export const PARALLAX = 0.06;
+/** Lenis smoothing: the share of the remaining distance covered per 60 Hz frame. */
+export const SCROLL_LERP = 0.2;

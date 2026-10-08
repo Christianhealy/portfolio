@@ -182,7 +182,8 @@ no audio, < 8 MB, exported from the master (not a Vimeo download). HandBrake
 ### 5.2 Chrome
 
 - Header: "Christian Healy" wordmark (→ `/stills`), nav **Stills · Film · About**.
-  Hides on scroll down, returns on scroll up; backdrop blur once scrolled.
+  Hides on scroll down, returns on scroll up; an opaque white backing fades in once
+  scrolled.
   Mobile: full-screen overlay menu.
 - Footer: email + Instagram from `about.md`.
 - Header/footer not shown on the splash.
@@ -210,22 +211,21 @@ it.
 
 - Libraries: `motion` (Framer Motion) and `lenis`.
 - Shared tokens: easing `cubic-bezier(0.16, 1, 0.3, 1)`; durations 400–900 ms.
-- **Global:** Lenis on desktop fine-pointer devices only; native scroll on touch,
-  inside the lightbox, and over Vimeo iframes.
+- **Global:** Lenis (lerp 0.2) on desktop fine-pointer devices only; native scroll on
+  touch, inside the lightbox, and over Vimeo iframes.
 - **Splash:** hero scales 1.06 → 1.0 on load; "Enter" fades in after it. On exit: slight
   zoom + crossfade.
 - **Route changes:** ~400 ms crossfade; scroll to top on navigation; native
   restoration on back/forward.
 - **Masonry:** tiles fade + rise ~24 px on first entry, staggered ~60 ms by
   column; images fade in from a blank placeholder once loaded.
-- **Parallax:** ≤ ±6 % translate, only on splash hero, about portrait, film-page
-  posters. Not on masonry tiles.
+- **Parallax:** ≤ ±6 % translate, only on the about portrait. Not on grid tiles.
 - **Headings:** line reveal on scroll-in.
 - **Film tiles:** hover dims siblings to ~60 %, caption lifts; loops play only
   while in viewport.
 - **Lightbox:** shared-layout zoom from thumbnail; horizontal slide between
   images; follows finger on swipe.
-- **Header:** slide hide/show; blur fades in after leaving top.
+- **Header:** slide hide/show; opaque backing fades in after leaving top.
 - **Reduced motion:** a single `useMotionPrefs()` disables Lenis, parallax,
   zooms and slides; everything becomes ≤ 200 ms opacity fades; loops show poster
   only.
@@ -306,6 +306,14 @@ image metadata (EXIF/date) of any kind.
   measured 0×0, so the first open on a cold cache slid without zooming.
 - **Film tiles fade in** from the placeholder once loaded, like the stills (poster and Vimeo
   thumbnail alike).
+- **Scrolling (measured):** a scripted wheel flick, Chromium at 4× CPU throttle, 3 runs each.
+  Lenis used `duration: 1.1`, which restarts its ease on every wheel notch, so the page
+  trailed the wheel by ~210 px and glided ~780 ms after it stopped; with `lerp: 0.2` that is
+  ~125 px and ~430 ms. The header's backdrop blur re-blurred the photos underneath on every
+  frame (stills graphics pipeline ~350 → ~100–180 ms per flick without it); it is now an
+  opaque backing. Parallax is only on the about portrait: the film grid tiles (never in this
+  spec) and the splash hero (already animated by its settle) no longer have it, which halved
+  frame work on /film; `will-change` is only set while parallax is active.
 - **Placeholder content:** Vimeo id 76979871 returns 404 from oEmbed (likely embed/privacy
   restricted), so its tile uses the typographic fallback. `about.md` uses
   `hello@example.com` until real details arrive.

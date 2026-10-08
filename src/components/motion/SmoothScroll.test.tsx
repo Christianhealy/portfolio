@@ -22,12 +22,14 @@ beforeEach(() => {
 });
 
 describe("SmoothScroll", () => {
-  it("starts Lenis (auto-raf, shared easing) on desktop fine pointers", () => {
+  it("starts Lenis on desktop fine pointers, following the wheel by lerp", () => {
     prefs = { reduced: false, smoothScroll: true };
     render(<SmoothScroll />);
     expect(instances).toHaveLength(1);
-    expect(instances[0]!.options).toMatchObject({ autoRaf: true });
-    expect(typeof instances[0]!.options["easing"]).toBe("function");
+    expect(instances[0]!.options).toMatchObject({ autoRaf: true, lerp: expect.any(Number) });
+    // A fixed duration restarts its ease on every wheel notch, so the page trails the wheel
+    // and glides on long after it stops (spec §10).
+    expect(instances[0]!.options).not.toHaveProperty("duration");
   });
 
   it("does nothing on touch devices or with reduced motion", () => {

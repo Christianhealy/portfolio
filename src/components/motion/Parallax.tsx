@@ -4,8 +4,8 @@ import { parallaxShift } from "./parallaxShift";
 import { useMotionPrefs } from "./useMotionPrefs";
 
 /**
- * Subtle vertical drift (≤ ±6 %) for the splash hero, about portrait and film posters only —
- * never masonry tiles. Static under reduced motion.
+ * Subtle vertical drift (≤ ±6 %) for the about portrait (spec §6), never grid tiles. Static
+ * under reduced motion.
  */
 export function Parallax({ children, className }: { children: ReactNode; className?: string }) {
   const { reduced } = useMotionPrefs();
@@ -18,7 +18,7 @@ export function Parallax({ children, className }: { children: ReactNode; classNa
       <motion.div
         data-parallax={reduced ? undefined : ""}
         style={reduced ? {} : { y }}
-        className="size-full will-change-transform"
+        className={reduced ? "size-full" : "size-full will-change-transform"}
       >
         {children}
       </motion.div>

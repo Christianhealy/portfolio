@@ -1,7 +1,6 @@
 import Lenis from "lenis";
-import { cubicBezier } from "motion";
 import { useEffect } from "react";
-import { EASE } from "./tokens";
+import { SCROLL_LERP } from "./tokens";
 import { useMotionPrefs } from "./useMotionPrefs";
 
 /**
@@ -14,7 +13,9 @@ export function SmoothScroll() {
 
   useEffect(() => {
     if (!smoothScroll) return;
-    const lenis = new Lenis({ autoRaf: true, duration: 1.1, easing: cubicBezier(...EASE) });
+    // Lerp, not a fixed duration: a duration restarts its ease on every wheel notch, so the page
+    // trails the wheel and keeps gliding long after it stops.
+    const lenis = new Lenis({ autoRaf: true, lerp: SCROLL_LERP });
     return () => lenis.destroy();
   }, [smoothScroll]);
 
