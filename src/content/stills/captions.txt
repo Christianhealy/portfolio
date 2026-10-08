@@ -1,0 +1,6 @@
+# Placeholder captions: one line per photo, "filename | caption".
+040-fog-house.jpg | House in fog
+070-calla-lily.jpg | Calla lily
+100-pier-in-fog.jpg | Pier, morning fog
+130-dancer.jpg | Dancer, underwater
+160-cafe-windows.jpg | Café windows
